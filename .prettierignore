@@ -1,0 +1,16 @@
+# Build and dependency output
+node_modules/
+dist/
+.angular/
+.husky/
+
+# Lockfiles and environment configs
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDEs and other assets
+.vscode/
+.idea/
+coverage/
+*.log
