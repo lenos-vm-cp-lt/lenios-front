@@ -1,0 +1,69 @@
+<div class="catalog-page">
+  <!-- Header de Navegación y Marca -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="brand-identity">
+        <div class="brand-logo-badge">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Leños <span>Rellenos</span></h1>
+          <p class="brand-subtitle">Catálogo Artesanal de Repostería</p>
+        </div>
+      </div>
+
+      <div class="header-badge">
+        <span class="pulse-dot"></span>
+        <span>Recién Horneados</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <!-- Carrusel Dinámico Principal -->
+      <section class="hero-carousel-section" aria-label="Productos destacados">
+        <app-home-carousel
+          [items]="featuredProducts"
+          [autoPlay]="true"
+          [autoPlayInterval]="4500"
+        />
+      </section>
+
+      <!-- Sección del Catálogo General de Productos -->
+      <section class="catalog-grid-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-tag">Nuestra Colección</span>
+            <h2 class="section-title">Todos Nuestros Leños Rellenos</h2>
+          </div>
+          <p class="section-description">
+            Elaborados diariamente con recetas auténticas, masajes de cacao fino y rellenos cremosos de alta calidad.
+          </p>
+        </div>
+
+        <!-- Grid Responsivo de Productos -->
+        <div class="products-grid">
+          @for (product of products; track product.id) {
+            <app-product-card [product]="product" />
+          }
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer de la aplicación -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h3>Leños Rellenos</h3>
+        <p>Tradición, sabor e innovación en cada bocado.</p>
+      </div>
+      <div class="footer-copyright">
+        <p>&copy; 2026 Leños Rellenos. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+</div>
