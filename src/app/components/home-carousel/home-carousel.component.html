@@ -1,0 +1,96 @@
+<div
+  class="carousel-container"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  role="region"
+  aria-label="Carrusel de Leños Rellenos Destacados"
+>
+  @if (items && items.length > 0) {
+    <!-- Slides Wrapper -->
+    <div class="carousel-track" [style.transform]="'translateX(-' + (currentIndex * 100) + '%)'">
+      @for (item of items; track item.id; let i = $index) {
+        <div
+          class="carousel-slide"
+          [class.active]="i === currentIndex"
+          [attr.aria-hidden]="i !== currentIndex"
+        >
+          <!-- Imagen de fondo WebP -->
+          <div class="slide-image-container">
+            <img
+              [src]="item.imageUrl"
+              [alt]="item.name"
+              class="slide-image"
+              loading="eager"
+            />
+            <div class="slide-overlay"></div>
+          </div>
+
+          <!-- Información y Hero CTA -->
+          <div class="slide-content">
+            <div class="slide-badge-row">
+              <span class="carousel-tag">Destacado de la Semana</span>
+              @if (item.badge) {
+                <span class="carousel-subtag">{{ item.badge }}</span>
+              }
+            </div>
+
+            <h2 class="slide-title">{{ item.name }}</h2>
+
+            <p class="slide-description">{{ item.description }}</p>
+
+            <div class="slide-actions">
+              <div class="slide-price-box">
+                <span class="price-subtitle">Desde</span>
+                <span class="price-value">{{ item.price | currency:'USD':'symbol':'1.2-2' }}</span>
+              </div>
+
+              <button class="carousel-cta-btn" type="button">
+                <span>Descubrir Sabor</span>
+                <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Botones de Navegación (Anterior / Siguiente) -->
+    <button
+      class="nav-btn prev-btn"
+      type="button"
+      (click)="prevSlide()"
+      aria-label="Anterior leño destacado"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button
+      class="nav-btn next-btn"
+      type="button"
+      (click)="nextSlide()"
+      aria-label="Siguiente leño destacado"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Indicadores de Posición (Dots) -->
+    <div class="indicators-container">
+      @for (item of items; track item.id; let i = $index) {
+        <button
+          class="indicator-dot"
+          [class.active]="i === currentIndex"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)"
+        >
+          <span class="dot-progress"></span>
+        </button>
+      }
+    </div>
+  }
+</div>
