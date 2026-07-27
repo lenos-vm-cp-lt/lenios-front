@@ -44,11 +44,21 @@
                 <span class="price-value">{{ item.price | currency:'USD':'symbol':'1.2-2' }}</span>
               </div>
 
-              <button class="carousel-cta-btn" type="button">
-                <span>Descubrir Sabor</span>
-                <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+              <button
+                class="carousel-cta-btn"
+                [class.added]="addedProductId === item.id"
+                type="button"
+                (click)="addToCart(item, $event)"
+                [attr.aria-label]="'Agregar ' + item.name + ' al carrito desde carrusel'"
+              >
+                @if (addedProductId === item.id) {
+                  <span>¡Agregado!</span>
+                } @else {
+                  <span>Agregar al Carrito</span>
+                  <svg class="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
               </button>
             </div>
           </div>

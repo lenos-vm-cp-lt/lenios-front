@@ -14,9 +14,29 @@
         </div>
       </div>
 
-      <div class="header-badge">
-        <span class="pulse-dot"></span>
-        <span>Recién Horneados</span>
+      <div class="header-right-actions">
+        <div class="header-badge d-none-mobile">
+          <span class="pulse-dot"></span>
+          <span>Recién Horneados</span>
+        </div>
+
+        <!-- Botón del Carrito en Header -->
+        <button
+          class="cart-header-btn"
+          type="button"
+          (click)="toggleCart()"
+          aria-label="Ver resumen de pedido"
+        >
+          <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span class="cart-label">Carrito</span>
+          <span class="cart-badge" [class.badge-active]="(itemCount$ | async)! > 0">
+            {{ (itemCount$ | async) ?? 0 }}
+          </span>
+        </button>
       </div>
     </div>
   </header>
@@ -40,7 +60,7 @@
             <h2 class="section-title">Todos Nuestros Leños Rellenos</h2>
           </div>
           <p class="section-description">
-            Elaborados diariamente con recetas auténticas, masajes de cacao fino y rellenos cremosos de alta calidad.
+            Elaborados diariamente con recetas auténticas, masas de cacao fino y rellenos cremosos de alta calidad.
           </p>
         </div>
 
@@ -53,6 +73,30 @@
       </section>
     </div>
   </main>
+
+  <!-- Panel Lateral / Modal de Resumen de Pedido (Order Summary Drawer) -->
+  @if (isCartOpen) {
+    <div class="cart-drawer-overlay" (click)="closeCart()" role="dialog" aria-modal="true" aria-label="Resumen de pedido">
+      <div class="cart-drawer-content" (click)="$event.stopPropagation()">
+        <app-order-summary (closePanel)="closeCart()" />
+      </div>
+    </div>
+  }
+
+  <!-- Botón Flotante para abrir el resumen de pedido en pantallas móviles y escritorio -->
+  <button
+    class="floating-cart-btn"
+    type="button"
+    (click)="toggleCart()"
+    aria-label="Abrir resumen del pedido"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+    <span class="floating-badge">{{ (itemCount$ | async) ?? 0 }}</span>
+  </button>
 
   <!-- Footer de la aplicación -->
   <footer class="main-footer">
