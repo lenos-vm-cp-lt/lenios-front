@@ -1,15 +1,29 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 /**
- * Servicio de Autenticación responsable de gestionar el estado de sesión del usuario
- * y el almacenamiento seguro del token JWT en localStorage.
+ * Servicio de Autenticación responsable de gestionar el estado de sesión del usuario,
+ * realizar peticiones HTTP al backend real y el almacenamiento seguro del token JWT en localStorage.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly API_URL = 'http://localhost:3000/api';
   private readonly TOKEN_KEY = 'lenios_jwt_token';
   private readonly USER_KEY = 'lenios_user_info';
+
+  /**
+   * Realiza una petición HTTP POST al backend para iniciar sesión.
+   * @param email Correo electrónico del usuario
+   * @param password Contraseña del usuario
+   * @returns Observable con la respuesta del servidor (token y datos del usuario)
+   */
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/auth/login`, { email, password });
+  }
 
   /**
    * Obtiene el token JWT guardado en localStorage.
@@ -47,14 +61,19 @@ export class AuthService {
   /**
    * Almacena información básica del usuario autenticado.
    */
-  setUserInfo(user: { email: string; name: string; role: string }): void {
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+  setUserInfo(user: any): void {
+    const formattedUser = {
+      ...user,
+      name: user.name || user.nombre || 'Usuario',
+      role: user.role || user.rol || 'Usuario'
+    };
+    localStorage.setItem(this.USER_KEY, JSON.stringify(formattedUser));
   }
 
   /**
    * Retorna la información guardada del usuario autenticado.
    */
-  getUserInfo(): { email: string; name: string; role: string } | null {
+  getUserInfo(): any {
     const userStr = localStorage.getItem(this.USER_KEY);
     if (!userStr) return null;
     try {
