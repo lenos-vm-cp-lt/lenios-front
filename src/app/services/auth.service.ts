@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3000/api';
+  private readonly API_URL = 'http://localhost:3000/api/v1';
   private readonly TOKEN_KEY = 'lenios_jwt_token';
   private readonly USER_KEY = 'lenios_user_info';
 
