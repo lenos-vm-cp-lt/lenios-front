@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 
 /**
  * Componente Standalone de Autenticación de Usuarios.
- * Proporciona el formulario de inicio de sesión de la plataforma.
+ * Proporciona el formulario de inicio de sesión de la plataforma conectado a la API real.
  */
 @Component({
   selector: 'app-login',
@@ -22,6 +22,11 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         <form (ngSubmit)="onLogin()" class="login-form">
+          <div *ngIf="errorMessage" class="error-alert" role="alert">
+            <span class="error-icon">⚠️</span>
+            <span>{{ errorMessage }}</span>
+          </div>
+
           <div class="form-group">
             <label for="email">Correo Electrónico</label>
             <input 
@@ -30,7 +35,8 @@ import { AuthService } from '../../services/auth.service';
               [(ngModel)]="email" 
               name="email" 
               required 
-              placeholder="admin@lenios.com" 
+              [disabled]="isLoading"
+              placeholder="admin@lenosrellenos.com" 
               class="form-control" />
           </div>
 
@@ -42,17 +48,15 @@ import { AuthService } from '../../services/auth.service';
               [(ngModel)]="password" 
               name="password" 
               required 
+              [disabled]="isLoading"
               placeholder="••••••••" 
               class="form-control" />
           </div>
 
-          <button type="submit" class="submit-btn">
-            Iniciar Sesión
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Iniciar Sesión</span>
+            <span *ngIf="isLoading">Iniciando sesión...</span>
           </button>
-
-          <div class="demo-hint">
-            💡 Demostración: Haz clic en "Iniciar Sesión" para generar un JWT de prueba e ingresar al Dashboard.
-          </div>
         </form>
 
         <div class="login-footer">
@@ -107,6 +111,22 @@ import { AuthService } from '../../services/auth.service';
       flex-direction: column;
       gap: 1.25rem;
     }
+    .error-alert {
+      background-color: #FEE2E2;
+      border: 1px solid #F87171;
+      color: #991B1B;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .error-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
     .form-group {
       display: flex;
       flex-direction: column;
@@ -129,6 +149,11 @@ import { AuthService } from '../../services/auth.service';
       border-color: var(--color-orange-primary);
       box-shadow: 0 0 0 3px rgba(232, 97, 0, 0.15);
     }
+    .form-control:disabled {
+      background-color: var(--color-bg-cream);
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
     .submit-btn {
       padding: 0.85rem;
       background: var(--color-orange-primary);
@@ -141,17 +166,13 @@ import { AuthService } from '../../services/auth.service';
       transition: var(--transition-fast);
       margin-top: 0.5rem;
     }
-    .submit-btn:hover {
+    .submit-btn:hover:not(:disabled) {
       background: var(--color-orange-bright);
       box-shadow: var(--shadow-glow);
     }
-    .demo-hint {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      background: var(--color-bg-cream);
-      padding: 0.75rem;
-      border-radius: var(--radius-sm);
-      border-left: 3px solid var(--color-orange-primary);
+    .submit-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
     .login-footer {
       margin-top: 1.5rem;
@@ -173,21 +194,47 @@ export class LoginComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  email = 'admin@lenios.com';
-  password = 'password123';
+  email = 'admin@lenosrellenos.com';
+  password = '';
+  isLoading = false;
+  errorMessage = '';
 
   onLogin(): void {
-    // Simular recepción de token JWT del backend
-    const mockJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1MTYyMzkwMjJ9.mock_signature';
-    
-    this.authService.setToken(mockJwtToken);
-    this.authService.setUserInfo({
-      name: 'Administrador Leños',
-      email: this.email,
-      role: 'Superadmin'
-    });
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Por favor ingresa tu correo y contraseña.';
+      return;
+    }
 
-    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
-    this.router.navigateByUrl(returnUrl);
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response?.token) {
+          this.authService.setToken(response.token);
+        }
+        if (response?.usuario) {
+          this.authService.setUserInfo(response.usuario);
+        } else if (response?.user) {
+          this.authService.setUserInfo(response.user);
+        }
+
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
+        this.router.navigateByUrl(returnUrl);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        if (err.status === 0) {
+          this.errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.';
+        } else if (err.error?.error) {
+          this.errorMessage = err.error.error;
+        } else if (err.status === 401 || err.status === 400) {
+          this.errorMessage = 'Credenciales incorrectas. Revisa tu correo y contraseña.';
+        } else {
+          this.errorMessage = 'Ocurrió un error al intentar iniciar sesión. Inténtalo de nuevo.';
+        }
+      }
+    });
   }
 }
