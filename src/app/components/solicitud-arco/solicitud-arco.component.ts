@@ -131,7 +131,6 @@ export class SolicitudArcoComponent {
         this.loading = false;
         console.error('Error al registrar la solicitud ARCO:', error);
         
-        // Manejar fallback elegante si el servidor responde con error o está fuera de línea durante demos
         if (error?.status === 201 || error?.status === 200) {
           this.respuestaExito = {
             folio: `ARCO-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
@@ -139,7 +138,7 @@ export class SolicitudArcoComponent {
             fechaRegistro: new Date().toISOString()
           };
         } else {
-          this.errorMessage = error?.error?.mensaje || 'Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo más tarde.';
+          this.errorMessage = error?.error?.message || error?.error?.error || error?.message || 'Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo más tarde.';
         }
       }
     });

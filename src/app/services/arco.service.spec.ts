@@ -3,6 +3,7 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { ArcoService } from './arco.service';
 import { SolicitudArcoRequest, SolicitudArcoResponse } from '../models/arco.model';
+import { ApiResponse } from '../models/api-response.model';
 
 describe('ArcoService', () => {
   let service: ArcoService;
@@ -37,20 +38,26 @@ describe('ArcoService', () => {
       motivo: 'Deseo consultar todos los datos personales almacenados en la plataforma.'
     };
 
-    const mockResponse: SolicitudArcoResponse = {
+    const mockData: SolicitudArcoResponse = {
       folio: 'ARCO-2026-98765',
       mensaje: 'Solicitud registrada correctamente.',
       fechaRegistro: '2026-07-28T18:30:00Z'
     };
 
+    const mockApiResponse: ApiResponse<SolicitudArcoResponse> = {
+      success: true,
+      message: 'Solicitud registrada correctamente.',
+      data: mockData
+    };
+
     service.crearSolicitud(mockRequest).subscribe((res) => {
-      expect(res).toEqual(mockResponse);
+      expect(res).toEqual(mockData);
       expect(res.folio).toBe('ARCO-2026-98765');
     });
 
     const req = httpMock.expectOne('/api/derechos-arco');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(mockRequest);
-    req.flush(mockResponse, { status: 201, statusText: 'Created' });
+    req.flush(mockApiResponse, { status: 201, statusText: 'Created' });
   });
 });

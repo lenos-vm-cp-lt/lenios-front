@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { SolicitudArcoRequest, SolicitudArcoResponse } from '../models/arco.model';
+import { ApiResponse } from '../models/api-response.model';
 
 /**
  * Servicio encargado de gestionar las solicitudes de Derechos ARCO de los clientes,
@@ -16,10 +17,18 @@ export class ArcoService {
 
   /**
    * Envía la solicitud de Derechos ARCO al servidor.
+   * Evalúa response.success y retorna la propiedad response.data con el folio único.
    * @param solicitud Datos del formulario completados por el cliente.
    * @returns Observable con la respuesta del servidor conteniendo el folio único de seguimiento.
    */
   crearSolicitud(solicitud: SolicitudArcoRequest): Observable<SolicitudArcoResponse> {
-    return this.http.post<SolicitudArcoResponse>(this.apiUrl, solicitud);
+    return this.http.post<ApiResponse<SolicitudArcoResponse>>(this.apiUrl, solicitud).pipe(
+      map(response => {
+        if (response && response.success) {
+          return response.data;
+        }
+        throw new Error(response?.message || 'No se pudo crear la solicitud ARCO.');
+      })
+    );
   }
 }
