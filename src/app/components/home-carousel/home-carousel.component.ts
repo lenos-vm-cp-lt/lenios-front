@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { Product } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
@@ -16,28 +16,26 @@ import { CartService } from '../../services/cart.service';
   styleUrl: './home-carousel.component.css'
 })
 export class HomeCarouselComponent implements OnInit, OnDestroy {
+  private platformId = inject(PLATFORM_ID);
+  private cartService = inject(CartService);
+
   /** Lista de productos (leños rellenos) a mostrar en el carrusel principal */
   @Input({ required: true }) items: Product[] = [];
 
   /** Indica si la transición automática de diapositivas está activa */
-  @Input() autoPlay: boolean = true;
+  @Input() autoPlay = true;
 
   /** Intervalo de tiempo en milisegundos entre cada diapositiva automática */
-  @Input() autoPlayInterval: number = 5000;
+  @Input() autoPlayInterval = 5000;
 
   /** Índice de la diapositiva visible actualmente */
-  currentIndex: number = 0;
+  currentIndex = 0;
 
   /** ID del producto que recientemente se agregó al carrito para efecto visual */
   addedProductId: string | number | null = null;
 
   /** Referencia al temporizador de reproducción automática */
-  private timer: any = null;
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private cartService: CartService
-  ) {}
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId) && this.autoPlay) {

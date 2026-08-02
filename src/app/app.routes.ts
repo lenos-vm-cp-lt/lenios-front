@@ -37,7 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'productos',
-        loadComponent: () => import('./components/admin/admin-productos/admin-productos.component').then(m => m.AdminProductosComponent)
+        loadComponent: () => import('./components/admin/admin-productos/admin-productos.component').then(m => m.GestionProductosComponent)
       },
       {
         path: 'pedidos',

@@ -31,4 +31,10 @@ export interface Product {
 
   /** Tiempo estimado de preparación o horneado en minutos */
   prepTime?: string;
+  
+  /** Indica si el producto está disponible para la venta */
+  disponible?: boolean;
+  
+  /** Cantidad de producto disponible en inventario */
+  stock?: number;
 }
