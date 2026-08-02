@@ -44,13 +44,22 @@
   <main class="main-content">
     <div class="content-wrapper">
       <!-- Carrusel Dinámico Principal -->
-      <section class="hero-carousel-section" aria-label="Productos destacados">
-        <app-home-carousel
-          [items]="featuredProducts"
-          [autoPlay]="true"
-          [autoPlayInterval]="4500"
-        />
-      </section>
+      @if (isLoading) {
+        <div class="carousel-loading-placeholder">
+          <div class="spinner"></div>
+          <p>Preparando los leños más sabrosos...</p>
+        </div>
+      } @else {
+        @if (featuredProducts.length > 0) {
+          <section class="hero-carousel-section" aria-label="Productos destacados">
+            <app-home-carousel
+              [items]="featuredProducts"
+              [autoPlay]="true"
+              [autoPlayInterval]="4500"
+            />
+          </section>
+        }
+      }
 
       <!-- Sección del Catálogo General de Productos -->
       <section class="catalog-grid-section">
@@ -64,20 +73,33 @@
           </p>
         </div>
 
-        <!-- Grid Responsivo de Productos -->
-        <div class="products-grid">
-          @for (product of products; track product.id) {
-            <app-product-card [product]="product" />
+        <!-- Grid Responsivo de Productos o Estados de Carga -->
+        @if (isLoading) {
+          <div class="catalog-loading-state">
+            <div class="spinner"></div>
+            <p>Cargando menú artesanal...</p>
+          </div>
+        } @else {
+          @if (products.length === 0) {
+            <div class="catalog-empty-state">
+              <p>Por el momento no contamos con leños horneados. ¡Regresa pronto!</p>
+            </div>
+          } @else {
+            <div class="products-grid">
+              @for (product of products; track product.id) {
+                <app-product-card [product]="product" />
+              }
+            </div>
           }
-        </div>
+        }
       </section>
     </div>
   </main>
 
   <!-- Panel Lateral / Modal de Resumen de Pedido (Order Summary Drawer) -->
   @if (isCartOpen) {
-    <div class="cart-drawer-overlay" (click)="closeCart()" role="dialog" aria-modal="true" aria-label="Resumen de pedido">
-      <div class="cart-drawer-content" (click)="$event.stopPropagation()">
+    <div class="cart-drawer-overlay" (click)="onOverlayClick($event)" role="presentation" tabindex="-1">
+      <div class="cart-drawer-content">
         <app-order-summary (closePanel)="closeCart()" />
       </div>
     </div>
