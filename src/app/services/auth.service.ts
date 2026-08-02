@@ -1,6 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { ApiResponse } from '../models/api-response.model';
+
+export interface AuthResponseData {
+  token: string;
+  usuario?: any;
+  user?: any;
+}
 
 /**
  * Servicio de Autenticación responsable de gestionar el estado de sesión del usuario,
@@ -17,12 +24,20 @@ export class AuthService {
 
   /**
    * Realiza una petición HTTP POST al backend para iniciar sesión.
+   * Evalúa response.success y retorna únicamente la propiedad response.data.
    * @param email Correo electrónico del usuario
    * @param password Contraseña del usuario
-   * @returns Observable con la respuesta del servidor (token y datos del usuario)
+   * @returns Observable con los datos de negocio autenticados (token y datos del usuario)
    */
-  login(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/login`, { email, password });
+  login(email: string, password: string): Observable<AuthResponseData> {
+    return this.http.post<ApiResponse<AuthResponseData>>(`${this.API_URL}/auth/login`, { email, password }).pipe(
+      map(response => {
+        if (response && response.success) {
+          return response.data;
+        }
+        throw new Error(response?.message || 'Falló el inicio de sesión.');
+      })
+    );
   }
 
   /**

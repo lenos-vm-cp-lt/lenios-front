@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar métricas del Dashboard:', err);
-        this.errorMessage = 'No se pudieron cargar los datos del panel de control.';
+        this.errorMessage = err?.error?.message || err?.error?.error || err?.message || 'No se pudieron cargar los datos del panel de control.';
         this.isLoading = false;
       }
     });

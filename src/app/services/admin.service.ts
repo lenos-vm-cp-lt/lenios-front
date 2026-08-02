@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { DashboardMetrics } from '../models/admin-dashboard.model';
+import { ApiResponse } from '../models/api-response.model';
 
 /**
  * Servicio encargado de gestionar las operaciones administrativas
@@ -18,11 +19,18 @@ export class AdminService {
 
   /**
    * Obtiene las métricas principales del Dashboard (Ventas del día, Pedidos pendientes, Productos activos).
+   * Evalúa response.success y retorna únicamente la propiedad response.data.
    * Incluye un fallback decorativo en caso de que la API backend no esté en ejecución durante las pruebas locales.
    * @returns Observable<DashboardMetrics>
    */
   getDashboardMetrics(): Observable<DashboardMetrics> {
-    return this.http.get<DashboardMetrics>(this.API_URL).pipe(
+    return this.http.get<ApiResponse<DashboardMetrics>>(this.API_URL).pipe(
+      map(response => {
+        if (response && response.success) {
+          return response.data;
+        }
+        throw new Error(response?.message || 'No se pudieron obtener las métricas del servidor.');
+      }),
       catchError(() => {
         // Datos mock de respaldo si la API aún no responde en entorno local
         const mockMetrics: DashboardMetrics = {
