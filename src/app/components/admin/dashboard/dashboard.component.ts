@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit {
   metrics: DashboardMetrics | null = null;
 
   /** Estado de carga de las métricas */
-  isLoading: boolean = true;
+  isLoading = true;
 
   /** Mensaje de error si la carga falla */
   errorMessage: string | null = null;

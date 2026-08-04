@@ -20,7 +20,7 @@ export class ProductCardComponent {
   @Input({ required: true }) product!: Product;
 
   /** Estado para activación de animación/badge temporal de "Agregado" */
-  isAdded: boolean = false;
+  isAdded = false;
 
   constructor(private cartService: CartService) {}
 

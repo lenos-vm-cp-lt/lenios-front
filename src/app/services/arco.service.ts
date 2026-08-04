@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
 import { SolicitudArcoRequest, SolicitudArcoResponse } from '../models/arco.model';
 import { ApiResponse } from '../models/api-response.model';
@@ -13,7 +14,7 @@ import { ApiResponse } from '../models/api-response.model';
 })
 export class ArcoService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/derechos-arco';
+  private readonly apiUrl = `${environment.apiUrl}/derechos-arco`;
 
   /**
    * Envía la solicitud de Derechos ARCO al servidor.

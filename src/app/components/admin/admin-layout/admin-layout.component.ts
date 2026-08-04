@@ -20,7 +20,7 @@ export class AdminLayoutComponent {
   private router = inject(Router);
 
   /** Estado de visibilidad del Sidebar en vistas móviles */
-  isSidebarOpen: boolean = false;
+  isSidebarOpen = false;
 
   /** Obtiene la información del usuario autenticado */
   get user() {

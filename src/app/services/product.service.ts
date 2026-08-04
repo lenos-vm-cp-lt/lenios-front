@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
 import { Product } from '../models/product.model';
 import { ApiResponse } from '../models/api-response.model';
@@ -25,7 +26,7 @@ export interface BackendProduct {
 })
 export class ProductService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/v1/productos';
+  private readonly apiUrl = `${environment.apiUrl}/productos`;
 
   /**
    * Mapea un producto del formato backend (Mongoose schema) al formato frontend (Product interface).
