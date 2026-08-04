@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { DashboardMetrics } from '../models/admin-dashboard.model';
@@ -13,7 +14,7 @@ import { ApiResponse } from '../models/api-response.model';
   providedIn: 'root'
 })
 export class AdminService {
-  private readonly API_URL = '/api/admin/dashboard/metrics';
+  private readonly API_URL = `${environment.apiUrl}/admin/dashboard/metrics`;
 
   constructor(private http: HttpClient) {}
 

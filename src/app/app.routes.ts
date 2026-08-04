@@ -20,6 +20,12 @@ export const routes: Routes = [
     loadComponent: () => import('./components/solicitud-arco/solicitud-arco.component').then(m => m.SolicitudArcoComponent)
   },
 
+  // Ruta pública de Aviso de Privacidad
+  {
+    path: 'aviso-privacidad',
+    loadComponent: () => import('./components/aviso-privacidad/aviso-privacidad.component').then(m => m.AvisoPrivacidadComponent)
+  },
+
   // Módulo de Administración (Ruta protegida por AuthGuard con Layout Base)
   {
     path: 'admin',

@@ -38,10 +38,84 @@
   width: 42px;
   height: 42px;
   background: rgba(232, 97, 0, 0.2);
+  outline: 2px solid var(--color-orange-primary);
+  outline-offset: 2px;
   border: 1px solid var(--color-orange-primary);
   border-radius: var(--radius-md);
   color: var(--color-orange-secondary);
 }
+
+/* Privacy Consent & Modal */
+.privacy-consent {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--color-orange-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 500;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.link-btn:hover {
+  color: var(--color-orange-bright);
+}
+
+.privacy-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.privacy-modal-content {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease-out;
+}
+
+.privacy-modal-content h3 {
+  color: var(--color-brown-darkest);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.privacy-modal-content p {
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.privacy-modal-footer {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .shopping-bag-icon {
   width: 22px;
@@ -442,4 +516,99 @@
   box-shadow: none !important;
   cursor: not-allowed !important;
   transform: none !important;
+}
+
+/* --- ESTILOS DEL FORMULARIO DE CHECKOUT --- */
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.half {
+  flex: 1;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-brown-dark);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--color-text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-orange-primary);
+  box-shadow: 0 0 0 3px rgba(232, 97, 0, 0.15);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.error-msg {
+  font-size: 0.75rem;
+  color: #D32F2F;
+  margin-top: 0.2rem;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  background: transparent;
+  color: var(--color-brown-dark);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.back-btn:hover {
+  background: rgba(0,0,0,0.05);
+  color: var(--color-brown-darkest);
+}
+
+.back-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.submit-btn {
+  flex: 1;
 }

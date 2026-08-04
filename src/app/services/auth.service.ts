@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
 
@@ -18,7 +19,7 @@ export interface AuthResponseData {
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3000/api/v1';
+  private readonly API_URL = environment.apiUrl;
   private readonly TOKEN_KEY = 'lenios_jwt_token';
   private readonly USER_KEY = 'lenios_user_info';
 
@@ -78,7 +79,8 @@ export class AuthService {
    */
   setUserInfo(user: any): void {
     const formattedUser = {
-      ...user,
+      id: user.id || user._id,
+      email: user.email,
       name: user.name || user.nombre || 'Usuario',
       role: user.role || user.rol || 'Usuario'
     };

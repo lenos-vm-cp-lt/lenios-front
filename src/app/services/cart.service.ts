@@ -37,7 +37,7 @@ export class CartService {
   /** Indica si la ejecución está ocurriendo dentro del entorno del navegador */
   private isBrowser: boolean;
 
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.loadInitialCart();
   }
@@ -94,7 +94,7 @@ export class CartService {
    * @param product Producto del catálogo a incorporar al carrito.
    * @param quantity Cantidad de unidades a agregar (por defecto es 1).
    */
-  public addToCart(product: Product, quantity: number = 1): void {
+  public addToCart(product: Product, quantity = 1): void {
     if (!product || quantity <= 0) return;
 
     const currentItems = [...this.itemsSubject.getValue()];

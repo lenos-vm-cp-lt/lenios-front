@@ -368,8 +368,27 @@
 }
 
 .footer-copyright p {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.9rem;
+  color: #777;
+  text-align: center;
+  margin: 0;
+}
+
+.footer-links {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.footer-link {
+  color: var(--color-orange-primary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }
 
 /* Loading States & Spinners */
