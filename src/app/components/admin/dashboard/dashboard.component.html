@@ -1,0 +1,128 @@
+<div class="dashboard-container">
+  <!-- Encabezado del Dashboard -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Panel de Control</h1>
+      <p class="dashboard-subtitle">Resumen ejecutivo y estado operativo en tiempo real de Leños Rellenos</p>
+    </div>
+    <button class="refresh-btn" (click)="loadMetrics()" [disabled]="isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.spin]="isLoading">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6"></path>
+        <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.3L2.5 16"></path>
+      </svg>
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Estado de Carga -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <span>Cargando indicadores del sistema...</span>
+  </div>
+
+  <!-- Mensaje de Error -->
+  <div *ngIf="errorMessage && !isLoading" class="error-banner">
+    <span>⚠️ {{ errorMessage }}</span>
+    <button (click)="loadMetrics()">Reintentar</button>
+  </div>
+
+  <!-- Grid de Métricas / Tarjetas Clave -->
+  <div *ngIf="metrics && !isLoading" class="metrics-grid">
+    <!-- Tarjeta 1: Ventas del día -->
+    <div class="metric-card card-sales">
+      <div class="card-header">
+        <span class="card-caption">Ventas del Día</span>
+        <div class="card-icon sales-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metric-value">{{ metrics.ventasDelDia | currency:'USD':'symbol':'1.2-2' }}</div>
+        <div class="metric-trend trend-positive">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          <span>+{{ metrics.ventasVariacion }}% vs. ayer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta 2: Pedidos pendientes -->
+    <div class="metric-card card-orders">
+      <div class="card-header">
+        <span class="card-caption">Pedidos Pendientes</span>
+        <div class="card-icon orders-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metric-value">{{ metrics.pedidosPendientes }}</div>
+        <div class="metric-trend trend-alert">
+          <span class="badge-urgent">{{ metrics.pedidosUrgentes }} en preparación urgente</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta 3: Productos activos -->
+    <div class="metric-card card-products">
+      <div class="card-header">
+        <span class="card-caption">Productos Activos</span>
+        <div class="card-icon products-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metric-value">{{ metrics.productosActivos }}</div>
+        <div class="metric-trend trend-neutral">
+          <span>Menú del restaurante actualizado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Pedidos Recientes -->
+  <div *ngIf="metrics && !isLoading" class="dashboard-details">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h2>Últimos Pedidos Registrados</h2>
+        <span class="view-all-link">Monitoreo continuo</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID Pedido</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Tiempo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of metrics.pedidosRecientes">
+              <td class="order-id">{{ order.id }}</td>
+              <td class="order-client">{{ order.cliente }}</td>
+              <td class="order-total">{{ order.total | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(order.estado)">
+                  {{ order.estado.replace('_', ' ') }}
+                </span>
+              </td>
+              <td class="order-time">{{ order.fecha }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

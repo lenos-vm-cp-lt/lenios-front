@@ -1,0 +1,77 @@
+<article class="product-card">
+  <!-- Contenedor de Imagen y Badge -->
+  <div class="card-image-wrapper">
+    @if (product.badge) {
+      <span class="product-badge" [class.badge-primary]="product.badge === 'Más Vendido' || product.badge === 'Favorito'">
+        {{ product.badge }}
+      </span>
+    }
+
+    @if (product.category) {
+      <span class="product-category">
+        {{ product.category }}
+      </span>
+    }
+
+    <img
+      [src]="product.imageUrl"
+      [alt]="product.name"
+      class="product-image"
+      loading="lazy"
+      decoding="async"
+    />
+
+    <div class="image-overlay"></div>
+  </div>
+
+  <!-- Contenido de la Tarjeta -->
+  <div class="card-body">
+    <div class="card-header">
+      <h3 class="product-title">{{ product.name }}</h3>
+      @if (product.rating) {
+        <div class="product-rating" aria-label="Calificación">
+          <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <span class="rating-value">{{ product.rating }}</span>
+        </div>
+      }
+    </div>
+
+    <p class="product-description">
+      {{ product.description }}
+    </p>
+
+    <!-- Footer de la tarjeta con precio e información -->
+    <div class="card-footer">
+      <div class="price-container">
+        <span class="price-label">Precio</span>
+        <span class="price-amount">{{ product.price | currency:'USD':'symbol':'1.2-2' }}</span>
+      </div>
+
+      <div class="actions-group">
+        <button
+          class="add-cart-btn"
+          [class.added]="isAdded"
+          type="button"
+          (click)="onAddToCart($event)"
+          [attr.aria-label]="'Agregar ' + product.name + ' al carrito'"
+        >
+          @if (isAdded) {
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>¡Agregado!</span>
+          } @else {
+            <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span>Agregar</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</article>
