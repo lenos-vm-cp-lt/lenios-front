@@ -7,6 +7,8 @@ export interface RecentOrder {
   total: number;
   estado: 'PENDIENTE' | 'EN_PREPARACION' | 'ENTREGADO' | 'CANCELADO';
   fecha: string;
+  metodoEntrega?: string;
+  metodoPago?: string;
 }
 
 /**

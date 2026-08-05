@@ -57,6 +57,12 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "headers": {
+              "X-Frame-Options": "DENY",
+              "Content-Security-Policy": "frame-ancestors 'none'"
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "lenios-front:build:production"

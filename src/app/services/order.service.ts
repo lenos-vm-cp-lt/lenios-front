@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
 import { CartItem } from '../models/cart-item.model';
@@ -34,7 +35,7 @@ export interface Order {
 })
 export class OrderService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/v1/orders';
+  private readonly apiUrl = `${environment.apiUrl}/orders`;
 
   /**
    * Obtiene la lista completa de pedidos (para el módulo de administración).

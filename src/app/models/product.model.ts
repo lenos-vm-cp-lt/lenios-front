@@ -5,6 +5,9 @@ export interface Product {
   /** Identificador único del producto */
   id: number | string;
 
+  /** ID de MongoDB de Mongoose (ObjectId) */
+  _id?: string;
+
   /** Nombre comercial del leño relleno */
   name: string;
 

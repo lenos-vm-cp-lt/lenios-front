@@ -103,6 +103,7 @@
             <tr>
               <th>ID Pedido</th>
               <th>Cliente</th>
+              <th>Método / Pago</th>
               <th>Total</th>
               <th>Estado</th>
               <th>Tiempo</th>
@@ -112,6 +113,16 @@
             <tr *ngFor="let order of metrics.pedidosRecientes">
               <td class="order-id">{{ order.id }}</td>
               <td class="order-client">{{ order.cliente }}</td>
+              <td>
+                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">
+                  <span style="background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; padding: 2px 8px; border-radius: 6px; font-weight: 600; width: fit-content;">
+                    {{ order.metodoEntrega || 'A domicilio' }}
+                  </span>
+                  <span style="color: #64748B; font-weight: 500;">
+                    💳 {{ order.metodoPago || 'Efectivo' }}
+                  </span>
+                </div>
+              </td>
               <td class="order-total">{{ order.total | currency:'USD':'symbol':'1.2-2' }}</td>
               <td>
                 <span class="badge" [ngClass]="getStatusBadgeClass(order.estado)">
