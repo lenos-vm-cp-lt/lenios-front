@@ -1,7 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
 import { FormsModule } from '@angular/forms';
 import { PedidoService, PedidoCreado, PedidoItem } from '../../../services/pedido.service';
 
@@ -13,6 +11,7 @@ import { PedidoService, PedidoCreado, PedidoItem } from '../../../services/pedid
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-pedidos.component.html',
+  styleUrls: ['./admin-pedidos.component.css'] // O pega tus estilos abajo en `styles` si usas estilos inline
   styles: [`
     .page-container { display: flex; flex-direction: column; gap: 1.5rem; }
     .page-title { font-size: 1.8rem; font-weight: 700; color: var(--color-brown-darkest); }
@@ -110,24 +109,17 @@ import { PedidoService, PedidoCreado, PedidoItem } from '../../../services/pedid
     /* Modal Styles */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       z-index: 1000;
       animation: fadeIn 0.2s ease-out;
     }
     .modal-content {
       background: #ffffff;
       border-radius: var(--radius-lg);
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
+      width: 90%; max-width: 600px; max-height: 90vh;
       overflow-y: auto;
       box-shadow: var(--shadow-lg);
       animation: slideUp 0.3s ease-out;
@@ -135,13 +127,8 @@ import { PedidoService, PedidoCreado, PedidoItem } from '../../../services/pedid
     .modal-header {
       padding: 1.5rem;
       border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      background: #ffffff;
-      z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; background: #ffffff; z-index: 10;
     }
     .modal-header h2 { margin: 0; font-size: 1.25rem; color: var(--color-brown-darkest); }
     .btn-close { background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; padding: 0.25rem; border-radius: var(--radius-sm); }
@@ -185,7 +172,6 @@ export class AdminPedidosComponent implements OnInit {
 
     this.pedidoService.getPedidos().subscribe({
       next: (pedidosList) => {
-        // Ordenamos del más reciente al más antiguo por createdAt (si existe)
         this.pedidos = pedidosList.sort((a, b) => {
           if (!a.createdAt || !b.createdAt) return 0;
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -221,7 +207,6 @@ export class AdminPedidosComponent implements OnInit {
         this.updatingPedidoId = null;
         this.errorMessage = err.message || 'No se pudo actualizar el estado del pedido.';
         
-        // Revertir el estado si falla
         const estadoAnterior = pedido.estado;
         pedido.estado = '';
         setTimeout(() => {
