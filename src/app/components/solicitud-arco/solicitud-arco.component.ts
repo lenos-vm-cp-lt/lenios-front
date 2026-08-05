@@ -36,7 +36,7 @@ export class SolicitudArcoComponent {
   });
 
   /** Estado de carga durante el envío a la API */
-  loading: boolean = false;
+  loading = false;
 
   /** Mensaje de error retornado por la API o fallo de conexión */
   errorMessage: string | null = null;
@@ -45,7 +45,7 @@ export class SolicitudArcoComponent {
   respuestaExito: SolicitudArcoResponse | null = null;
 
   /** Estado para confirmar si se copió el folio al portapapeles */
-  copiedFolio: boolean = false;
+  copiedFolio = false;
 
   /** Opciones disponibles para el tipo de derecho ARCO */
   tiposDerechoOptions: OptionTipoDerecho[] = [

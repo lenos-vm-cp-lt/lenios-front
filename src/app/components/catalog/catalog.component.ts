@@ -7,6 +7,7 @@ import { ProductCardComponent } from '../product-card/product-card.component';
 import { OrderSummaryComponent } from '../order-summary/order-summary.component';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { RouterLink } from '@angular/router';
 
 /**
  * Componente Standalone de la Vista Principal / Catálogo Digital de Leños Rellenos.
@@ -16,7 +17,7 @@ import { ProductService } from '../../services/product.service';
 @Component({
   selector: 'app-catalog',
   standalone: true,
-  imports: [CommonModule, HomeCarouselComponent, ProductCardComponent, OrderSummaryComponent],
+  imports: [CommonModule, HomeCarouselComponent, ProductCardComponent, OrderSummaryComponent, RouterLink],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.css'
 })

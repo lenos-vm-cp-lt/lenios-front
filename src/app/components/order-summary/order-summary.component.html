@@ -10,8 +10,8 @@
         </svg>
       </div>
       <div>
-        <h2 class="summary-title">Resumen de Pedido</h2>
-        <p class="summary-subtitle">Revisa tus leños rellenos seleccionados</p>
+        <h2 class="summary-title">{{ step === 'cart' ? 'Resumen de Pedido' : 'Finalizar Pedido' }}</h2>
+        <p class="summary-subtitle">{{ step === 'cart' ? 'Revisa tus leños rellenos seleccionados' : 'Completa tus datos para confirmar' }}</p>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
 
   <!-- Contenido Principal: Carrito con ítems O Estado Vacío -->
   <main class="summary-body">
-    @if (cartItems.length > 0) {
+    @if (step === 'cart' && cartItems.length > 0) {
       <div class="items-header-bar">
         <span class="items-count-tag">{{ itemCount }} {{ itemCount === 1 ? 'producto' : 'productos' }} en el carrito</span>
         <button class="clear-cart-btn" type="button" (click)="clearAll()" title="Vaciar todo el carrito">
@@ -101,6 +101,55 @@
           </li>
         }
       </ul>
+    } @else if (step === 'checkout') {
+      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmitOrder()" class="checkout-form">
+        <div class="form-group">
+          <label for="nombre">Nombre Completo *</label>
+          <input type="text" id="nombre" formControlName="nombre" placeholder="Ej. Carlos Palma" />
+          @if (checkoutForm.get('nombre')?.invalid && checkoutForm.get('nombre')?.touched) {
+            <span class="error-msg">El nombre es requerido</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono *</label>
+          <input type="tel" id="telefono" formControlName="telefono" placeholder="Ej. 4181234567" />
+          @if (checkoutForm.get('telefono')?.invalid && checkoutForm.get('telefono')?.touched) {
+            <span class="error-msg">Ingresa un teléfono válido de 10 dígitos</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="ubicacion">Dirección de Entrega *</label>
+          <input type="text" id="ubicacion" formControlName="ubicacion" placeholder="Ej. Calle Hidalgo #123, Col. Centro" />
+          @if (checkoutForm.get('ubicacion')?.invalid && checkoutForm.get('ubicacion')?.touched) {
+            <span class="error-msg">La dirección es requerida</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="metodoEntrega">Método de Entrega</label>
+            <select id="metodoEntrega" formControlName="metodoEntrega">
+              <option value="A domicilio">A domicilio</option>
+              <option value="Pasar a recoger">Pasar a recoger</option>
+            </select>
+          </div>
+          <div class="form-group half">
+            <label for="metodoPago">Método de Pago</label>
+            <select id="metodoPago" formControlName="metodoPago">
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Tarjeta">Tarjeta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notas">Notas Adicionales</label>
+          <textarea id="notas" formControlName="notas" placeholder="Ej. Sin cebolla, salsa aparte..." rows="2"></textarea>
+        </div>
+      </form>
     } @else {
       <!-- Estado Visual para Carrito Vacío -->
       <div class="empty-cart-state" role="alert">
@@ -140,7 +189,7 @@
     </div>
 
     <!-- Alerta visual si está deshabilitado -->
-    @if (itemCount === 0) {
+    @if (itemCount === 0 && step === 'cart') {
       <div class="disabled-alert-banner">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/>
@@ -151,21 +200,65 @@
       </div>
     }
 
-    <button
-      class="checkout-btn"
-      type="button"
-      [disabled]="itemCount === 0"
-      [class.btn-disabled]="itemCount === 0"
-      (click)="onCheckout()"
-    >
-      @if (itemCount === 0) {
-        <span>Carrito Vacío</span>
-      } @else {
-        <span>Confirmar Pedido ({{ itemCount }} {{ itemCount === 1 ? 'ítem' : 'ítems' }})</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
+    @if (step === 'checkout') {
+      <div class="privacy-consent">
+        <p>Al realizar tu pedido, aceptas nuestro <button type="button" class="link-btn" (click)="openPrivacyModal()">Aviso de Privacidad</button>.</p>
+      </div>
+    }
+
+    <div class="footer-actions">
+      @if (step === 'cart') {
+        <button
+          class="checkout-btn"
+          type="button"
+          [disabled]="itemCount === 0"
+          [class.btn-disabled]="itemCount === 0"
+          (click)="onGoToCheckout()"
+        >
+          @if (itemCount === 0) {
+            <span>Carrito Vacío</span>
+          } @else {
+            <span>Proceder al Pago ({{ itemCount }} {{ itemCount === 1 ? 'ítem' : 'ítems' }})</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          }
+        </button>
+      } @else if (step === 'checkout') {
+        <button class="back-btn" type="button" (click)="onBackToCart()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>Volver al Carrito</span>
+        </button>
+        <button
+          class="checkout-btn submit-btn"
+          type="button"
+          [disabled]="isSubmitting"
+          (click)="onSubmitOrder()"
+        >
+          <span>{{ isSubmitting ? 'Procesando...' : 'Confirmar y Enviar a WhatsApp' }}</span>
+          @if (!isSubmitting) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          }
+        </button>
       }
-    </button>
+    </div>
   </footer>
+
+  <!-- Modal Aviso Privacidad Simplificado -->
+  @if (showPrivacyModal) {
+    <div class="privacy-modal-overlay" (click)="closePrivacyModal()" (keydown.escape)="closePrivacyModal()" tabindex="0">
+      <div class="privacy-modal-content" (click)="$event.stopPropagation()">
+        <h3>Aviso de Privacidad Simplificado</h3>
+        <p>Tus datos personales (nombre, teléfono y dirección) serán utilizados exclusivamente para el procesamiento, gestión y entrega de este pedido, así como para contactarte en caso de requerir confirmación del mismo a través de WhatsApp o llamada telefónica.</p>
+        <p>Al confirmar tu compra, otorgas tu consentimiento para el tratamiento de dichos datos.</p>
+        <div class="privacy-modal-footer">
+          <button class="btn-primary" type="button" (click)="closePrivacyModal()">Entendido</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

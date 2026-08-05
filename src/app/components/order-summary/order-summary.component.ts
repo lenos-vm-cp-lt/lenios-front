@@ -1,8 +1,10 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cart-item.model';
+import { PedidoService, PedidoPayload, PedidoCreado, PedidoItem } from '../../services/pedido.service';
 
 /**
  * Componente Standalone de Resumen de Pedido (Order Summary).
@@ -14,7 +16,7 @@ import { CartItem } from '../../models/cart-item.model';
 @Component({
   selector: 'app-order-summary',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './order-summary.component.html',
   styleUrl: './order-summary.component.css'
 })
@@ -26,15 +28,34 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
 
   /** Monto total acumulado */
-  total: number = 0;
+  total = 0;
 
   /** Cantidad total de productos/unidades */
-  itemCount: number = 0;
+  itemCount = 0;
+
+  /** Paso actual: 'cart' (carrito) o 'checkout' (formulario) */
+  step: 'cart' | 'checkout' = 'cart';
+
+  checkoutForm: FormGroup;
+  isSubmitting = false;
+  showPrivacyModal = false;
+
+  private readonly pedidoService = inject(PedidoService);
+  private readonly fb = inject(FormBuilder);
 
   /** Suscripciones activas para desuscripción limpia */
   private subscriptions: Subscription = new Subscription();
 
-  constructor(public cartService: CartService) {}
+  constructor(public cartService: CartService) {
+    this.checkoutForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.maxLength(100)]],
+      telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]+$')]],
+      ubicacion: ['', [Validators.required, Validators.maxLength(250)]],
+      metodoPago: ['Efectivo', Validators.required],
+      metodoEntrega: ['A domicilio', Validators.required],
+      notas: ['', Validators.maxLength(500)]
+    });
+  }
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -52,6 +73,9 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.cartService.itemCount$.subscribe(count => {
         this.itemCount = count;
+        if (count === 0 && this.step === 'checkout') {
+          this.step = 'cart';
+        }
       })
     );
   }
@@ -62,8 +86,6 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
 
   /**
    * Incrementa la cantidad de un ítem en 1 unidad.
-   * @param productId ID del producto a incrementar.
-   * @param currentQuantity Cantidad actual del producto.
    */
   incrementQuantity(productId: string | number, currentQuantity: number): void {
     this.cartService.updateQuantity(productId, currentQuantity + 1);
@@ -71,8 +93,6 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
 
   /**
    * Decrementa la cantidad de un ítem en 1 unidad. Si la cantidad llega a 0, se remueve.
-   * @param productId ID del producto a decrementar.
-   * @param currentQuantity Cantidad actual del producto.
    */
   decrementQuantity(productId: string | number, currentQuantity: number): void {
     this.cartService.updateQuantity(productId, currentQuantity - 1);
@@ -80,7 +100,6 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
 
   /**
    * Elimina un producto específico del carrito.
-   * @param productId ID del producto a remover.
    */
   removeItem(productId: string | number): void {
     this.cartService.removeFromCart(productId);
@@ -96,11 +115,111 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Avanza al paso de checkout
+   */
+  onGoToCheckout(): void {
+    if (this.itemCount === 0) return;
+    this.step = 'checkout';
+  }
+
+  /**
+   * Regresa al paso del carrito
+   */
+  onBackToCart(): void {
+    this.step = 'cart';
+  }
+
+  openPrivacyModal(): void {
+    this.showPrivacyModal = true;
+  }
+
+  closePrivacyModal(): void {
+    this.showPrivacyModal = false;
+  }
+
+  /**
    * Notifica el intento de procesar o confirmar la compra.
    */
-  onCheckout(): void {
-    if (this.itemCount === 0) return;
-    alert(`¡Gracias por tu pedido! Has seleccionado ${this.itemCount} leño(s) por un total de $${this.total.toFixed(2)}.`);
+  onSubmitOrder(): void {
+    if (this.checkoutForm.invalid || this.itemCount === 0) {
+      this.checkoutForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const formValue = this.checkoutForm.value;
+    
+    const payload: PedidoPayload = {
+      cliente: {
+        nombre: formValue.nombre,
+        telefono: formValue.telefono,
+        ubicacion: formValue.ubicacion
+      },
+      productos_solicitados: this.cartItems.map(item => ({
+        id_producto: String(item.product.id),
+        cantidad: item.quantity,
+        precio_unitario: item.product.price,
+        nombre: item.product.name // Guardado temporal para el mensaje de WhatsApp
+      } as unknown as PedidoItem)),
+      total: this.total,
+      metodoPago: formValue.metodoPago,
+      metodoEntrega: formValue.metodoEntrega,
+      notas: formValue.notas || ''
+    };
+
+    this.pedidoService.crearPedido(payload).subscribe({
+      next: (pedidoCreado) => {
+        // En caso de que el backend no devuelva el nombre del producto, lo tomamos del payload original temporal.
+        const pedidoParaWhatsApp = {
+          ...pedidoCreado,
+          productos_solicitados: payload.productos_solicitados
+        };
+        
+        this.enviarAWhatsApp(pedidoParaWhatsApp as PedidoCreado);
+        this.isSubmitting = false;
+        this.onClose();
+      },
+      error: (err) => {
+        console.error('Error al crear pedido', err);
+        alert('Ocurrió un error al crear el pedido. Inténtalo de nuevo.');
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  /**
+   * Función de utilidad para abrir el chat de WhatsApp
+   */
+  enviarAWhatsApp(pedidoCreado: PedidoCreado): void {
+    const numeroNegocio = '524151013579'; // Número oficial de Leños Rellenos
+    
+    // Construcción del desglose de productos
+    const listaProductos = pedidoCreado.productos_solicitados
+      .map((item: PedidoItem & { nombre?: string, producto?: { nombre: string } }) => `• ${item.cantidad}x ${item.producto?.nombre || item.nombre || 'Leño'} ($${item.precio_unitario} c/u)`)
+      .join('\n');
+
+    // Formato del mensaje para WhatsApp
+    const mensaje = `¡Hola Leños Rellenos! 🪵🔥
+Acabo de realizar mi pedido desde la página web.
+
+📌 *Orden ID:* #${pedidoCreado._id}
+👤 *Cliente:* ${pedidoCreado.cliente.nombre}
+📞 *Teléfono:* ${pedidoCreado.cliente.telefono}
+📍 *Dirección:* ${pedidoCreado.cliente.ubicacion}
+
+🛒 *Detalle del Pedido:*
+${listaProductos}
+
+💵 *Total:* $${pedidoCreado.total} MXN
+💳 *Método de Pago:* ${pedidoCreado.metodoPago || 'Efectivo'}
+📝 *Notas:* ${pedidoCreado.notas || 'Sin notas'}
+
+¡Quedo a la espera de su confirmación!`;
+
+    const urlWhatsApp = `https://api.whatsapp.com/send?phone=${numeroNegocio}&text=${encodeURIComponent(mensaje)}`;
+    window.open(urlWhatsApp, '_blank');
+    this.cartService.clearCart();
   }
 
   /**
