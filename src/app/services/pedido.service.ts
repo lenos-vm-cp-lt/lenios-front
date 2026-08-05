@@ -23,6 +23,7 @@ export interface PedidoPayload {
   metodoPago: string;
   metodoEntrega: string;
   notas?: string;
+  consentimiento: boolean;
 }
 
 export interface PedidoCreado {
@@ -34,8 +35,11 @@ export interface PedidoCreado {
   total: number;
   estado: string;
   createdAt: string;
-  metodoPago: string;
-  metodoEntrega: string;
+  metodoPago?: string;
+  metodoEntrega?: string;
+  metodo_pago?: string;
+  metodo_entrega?: string;
+  metodo_envio?: string;
   notas?: string;
 }
 

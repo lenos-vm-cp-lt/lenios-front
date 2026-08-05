@@ -612,3 +612,90 @@
 .submit-btn {
   flex: 1;
 }
+
+/* Estilos para el Checkbox de Consentimiento de Privacidad */
+.checkbox-group {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-orange-subtle, rgba(232, 97, 0, 0.05));
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  transition: var(--transition-fast, all 0.2s ease);
+}
+
+.checkbox-group.has-error {
+  border-color: #D32F2F;
+  background-color: rgba(211, 47, 47, 0.05);
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.custom-checkbox {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.15rem;
+  accent-color: var(--color-orange-primary, #E86100);
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-size: 0.85rem;
+  color: var(--color-text-main, #333);
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+}
+
+.privacy-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-orange-primary, #E86100);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  transition: var(--transition-fast, color 0.2s);
+}
+
+.privacy-link-btn:hover {
+  color: var(--color-orange-secondary, #C55000);
+}
+
+.pickup-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background-color: #FEF3C7;
+  border: 1px solid #FCD34D;
+  border-radius: var(--radius-sm, 8px);
+  color: #92400E;
+  margin: 0.25rem 0;
+}
+
+.pickup-info-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #D97706;
+}
+
+.pickup-info-banner strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+  color: #78350F;
+}
+
+.pickup-info-banner p {
+  font-size: 0.825rem;
+  margin: 0;
+  line-height: 1.4;
+  color: #92400E;
+}
+

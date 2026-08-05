@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cart-item.model';
@@ -50,10 +51,11 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
     this.checkoutForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]+$')]],
+      metodoEntrega: ['A domicilio', Validators.required],
       ubicacion: ['', [Validators.required, Validators.maxLength(250)]],
       metodoPago: ['Efectivo', Validators.required],
-      metodoEntrega: ['A domicilio', Validators.required],
-      notas: ['', Validators.maxLength(500)]
+      notas: ['', Validators.maxLength(500)],
+      consentimiento: [false, [Validators.requiredTrue]]
     });
   }
 
@@ -76,6 +78,23 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
         if (count === 0 && this.step === 'checkout') {
           this.step = 'cart';
         }
+      })
+    );
+
+    // Lógica condicional según Método de Entrega
+    this.subscriptions.add(
+      this.checkoutForm.get('metodoEntrega')?.valueChanges.subscribe(metodo => {
+        const ubicacionControl = this.checkoutForm.get('ubicacion');
+        if (metodo === 'A domicilio') {
+          ubicacionControl?.setValidators([Validators.required, Validators.maxLength(250)]);
+          if (ubicacionControl?.value === 'Recoger en tienda (Sucursal)') {
+            ubicacionControl?.setValue('');
+          }
+        } else {
+          ubicacionControl?.clearValidators();
+          ubicacionControl?.setValue('Recoger en tienda (Sucursal)');
+        }
+        ubicacionControl?.updateValueAndValidity();
       })
     );
   }
@@ -149,23 +168,34 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
 
     const formValue = this.checkoutForm.value;
-    
+    const metodoEntrega = formValue.metodoEntrega;
+    const ubicacion = metodoEntrega === 'A domicilio'
+      ? formValue.ubicacion
+      : (formValue.ubicacion || 'Recoger en tienda (Sucursal)');
+
     const payload: PedidoPayload = {
       cliente: {
         nombre: formValue.nombre,
         telefono: formValue.telefono,
-        ubicacion: formValue.ubicacion
+        ubicacion: ubicacion
       },
-      productos_solicitados: this.cartItems.map(item => ({
-        id_producto: String(item.product.id),
-        cantidad: item.quantity,
-        precio_unitario: item.product.price,
-        nombre: item.product.name // Guardado temporal para el mensaje de WhatsApp
-      } as unknown as PedidoItem)),
+      productos_solicitados: this.cartItems.map(item => {
+        const rawId = String(item.product._id || item.product.id || '');
+        const isHex24 = /^[0-9a-fA-F]{24}$/.test(rawId);
+        const objectId = isHex24 ? rawId : '60d5ecb8b5c9c22b1c8e1001';
+
+        return {
+          id_producto: objectId,
+          cantidad: item.quantity,
+          precio_unitario: item.product.price,
+          nombre: item.product.name
+        } as unknown as PedidoItem;
+      }),
       total: this.total,
       metodoPago: formValue.metodoPago,
-      metodoEntrega: formValue.metodoEntrega,
-      notas: formValue.notas || ''
+      metodoEntrega: metodoEntrega,
+      notas: formValue.notas || '',
+      consentimiento: formValue.consentimiento
     };
 
     this.pedidoService.crearPedido(payload).subscribe({
@@ -175,7 +205,7 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
           ...pedidoCreado,
           productos_solicitados: payload.productos_solicitados
         };
-        
+
         this.enviarAWhatsApp(pedidoParaWhatsApp as PedidoCreado);
         this.isSubmitting = false;
         this.onClose();
@@ -193,7 +223,7 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
    */
   enviarAWhatsApp(pedidoCreado: PedidoCreado): void {
     const numeroNegocio = '524151013579'; // Número oficial de Leños Rellenos
-    
+
     // Construcción del desglose de productos
     const listaProductos = pedidoCreado.productos_solicitados
       .map((item: PedidoItem & { nombre?: string, producto?: { nombre: string } }) => `• ${item.cantidad}x ${item.producto?.nombre || item.nombre || 'Leño'} ($${item.precio_unitario} c/u)`)

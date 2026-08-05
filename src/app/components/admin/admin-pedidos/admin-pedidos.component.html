@@ -1,0 +1,184 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Gestión de Pedidos</h1>
+    <p class="page-subtitle">Supervisa las órdenes entrantes, estados de despacho y atención al cliente</p>
+  </div>
+
+  <!-- Alertas de estado -->
+  @if (successMessage) {
+    <div class="alert alert-success" role="alert">
+      <span>✅ {{ successMessage }}</span>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">
+      <span>⚠️ {{ errorMessage }}</span>
+    </div>
+  }
+
+  <!-- Listado de Pedidos -->
+  <div class="card table-card">
+    <div class="table-header-row">
+      <h2>Órdenes Recientes</h2>
+      <button class="btn btn-primary" (click)="loadPedidos()">
+        🔄 Actualizar
+      </button>
+    </div>
+    
+    @if (isLoading) {
+      <div class="loading-state">
+        <p>Cargando pedidos...</p>
+      </div>
+    } @else {
+      @if (pedidos.length === 0) {
+        <div class="empty-state">
+          <p>No se encontraron pedidos registrados.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Método / Pago</th>
+                <th>Resumen</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Actualizar Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (pedido of pedidos; track pedido._id) {
+                <tr>
+                  <td><strong>#{{ pedido._id | slice:-6 }}</strong></td>
+                  <td>
+                    <div class="client-info">
+                      <span class="client-name">{{ pedido.cliente.nombre || 'Sin nombre' }}</span>
+                      <span class="client-phone">📞 {{ pedido.cliente.telefono || 'N/A' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="delivery-info">
+                      <span class="badge-cat">{{ pedido.metodoEntrega || pedido.metodo_entrega || pedido.metodo_envio || 'A domicilio' }}</span>
+                      <span class="payment-method">💳 {{ pedido.metodoPago || pedido.metodo_pago || 'Efectivo' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="order-summary-items">
+                      {{ getResumenProductos(pedido) }}
+                    </div>
+                  </td>
+                  <td>${{ (pedido.total || 0).toFixed(2) }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getBadgeClass(pedido.estado)">
+                      {{ pedido.estado || 'Pendiente' }}
+                    </span>
+                  </td>
+                  <td>
+                    <select 
+                      class="form-control select-input select-status" 
+                      [ngModel]="pedido.estado"
+                      (ngModelChange)="onStatusChange(pedido, $event)"
+                      [disabled]="updatingPedidoId === pedido._id">
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="En preparacion">En Preparación</option>
+                      <option value="En camino">En Camino</option>
+                      <option value="Entregado">Entregado</option>
+                      <option value="Cancelado">Cancelado</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button class="btn btn-icon btn-view" (click)="openModal(pedido)" aria-label="Ver Detalles" title="Ver Detalles">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Modal de Detalles del Pedido -->
+@if (selectedPedido) {
+  <div class="modal-overlay" (click)="closeModal()" (keydown.escape)="closeModal()" (keydown.enter)="closeModal()" tabindex="0">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalles del Pedido <strong>#{{ selectedPedido._id | slice:-6 }}</strong></h2>
+        <button class="btn-close" (click)="closeModal()" aria-label="Cerrar modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 4-4H8a4 4 0 0 4-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Datos del Cliente</h3>
+          <p><strong>Nombre:</strong> {{ selectedPedido.cliente.nombre }}</p>
+          <p><strong>Teléfono:</strong> {{ selectedPedido.cliente.telefono }}</p>
+          <p><strong>Dirección / Ubicación:</strong> {{ selectedPedido.cliente.ubicacion }}</p>
+        </div>
+        
+        <div class="detail-section grid-2">
+          <div>
+            <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> Método de Pago</h3>
+            <p>{{ selectedPedido.metodoPago || selectedPedido.metodo_pago || 'Efectivo' }}</p>
+          </div>
+          <div>
+            <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg> Método de Entrega</h3>
+            <p>{{ selectedPedido.metodoEntrega || selectedPedido.metodo_entrega || selectedPedido.metodo_envio || 'A domicilio' }}</p>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Notas Adicionales</h3>
+          <p class="notes-text">{{ selectedPedido.notas || 'Sin notas' }}</p>
+        </div>
+
+        <div class="detail-section">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> Productos Solicitados</h3>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Precio U.</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of selectedPedido.productos_solicitados; track item.id_producto) {
+                <tr>
+                  <td>{{ getProductName(item) }}</td>
+                  <td>{{ item.cantidad }}</td>
+                  <td>${{ item.precio_unitario.toFixed(2) }}</td>
+                  <td>${{ (item.cantidad * item.precio_unitario).toFixed(2) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="modal-footer">
+          <div class="modal-status">
+            <span class="status-badge" [ngClass]="getBadgeClass(selectedPedido.estado)">
+              {{ selectedPedido.estado }}
+            </span>
+            <span class="date-info">{{ selectedPedido.createdAt | date:'short' }}</span>
+          </div>
+          <div class="modal-total">
+            <span>Total:</span>
+            <strong>${{ selectedPedido.total.toFixed(2) }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
