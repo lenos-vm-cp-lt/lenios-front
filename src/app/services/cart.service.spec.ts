@@ -57,7 +57,7 @@ describe('CartService', () => {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(preloadedCart));
 
       // Re-crear la instancia del servicio para simular recarga de página
-      const newServiceInstance = new CartService('browser');
+      const newServiceInstance = new CartService('browser' as unknown as object);
       expect(newServiceInstance.getItems().length).toBe(2);
       expect(newServiceInstance.getItemCount()).toBe(3);
       expect(newServiceInstance.getTotal()).toBe(55.48); // 19.99*2 + 15.50 = 39.98 + 15.50 = 55.48
@@ -65,7 +65,7 @@ describe('CartService', () => {
 
     it('debe manejar adecuadamente un JSON corrupto en localStorage reiniciando el carrito a vacío', () => {
       localStorage.setItem(CART_STORAGE_KEY, '{invalid_json}');
-      const newServiceInstance = new CartService('browser');
+      const newServiceInstance = new CartService('browser' as unknown as object);
       expect(newServiceInstance.getItems()).toEqual([]);
       expect(newServiceInstance.getItemCount()).toBe(0);
     });
