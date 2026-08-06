@@ -42,7 +42,7 @@ export interface PedidoCreado {
   pagoRecibido?: boolean;
   estado_pago?: string;
   estadoPago?: string;
-  createdAt: string;
+  createdAt?: string;
   metodoPago?: string;
   metodoEntrega?: string;
   metodo_pago?: string;
@@ -59,8 +59,7 @@ export class PedidoService {
   private readonly apiUrl = `${environment.apiUrl}/pedidos`;
 
   /**
-   * Crea un nuevo pedido enviando los datos al backend (Flujo de cliente).
-   * @param payload Datos del pedido.
+   * Crea un nuevo pedido enviando los datos al backend.
    */
   crearPedido(payload: PedidoPayload): Observable<PedidoCreado> {
     return this.http.post<ApiResponse<PedidoCreado>>(this.apiUrl, payload).pipe(
@@ -74,48 +73,52 @@ export class PedidoService {
   }
 
   /**
-   * Obtiene la lista completa de pedidos (Flujo de admin).
+   * Obtiene la lista completa de pedidos.
    */
   getPedidos(): Observable<PedidoCreado[]> {
-    return this.http.get<ApiResponse<PedidoCreado[]>>(this.apiUrl).pipe(
+    return this.http.get<ApiResponse<PedidoCreado[]> | PedidoCreado[]>(this.apiUrl).pipe(
       map(response => {
+        if (Array.isArray(response)) {
+          return response;
+        }
         if (response && response.success && Array.isArray(response.data)) {
           return response.data;
         }
-        return response?.data || [];
+        return (response as ApiResponse<PedidoCreado[]>)?.data || [];
       })
     );
   }
 
   /**
    * Actualiza el estado de un pedido específico.
-   * @param id ID del pedido a actualizar.
-   * @param estado Nuevo estado.
    */
   updateEstadoPedido(id: string, estado: string): Observable<PedidoCreado> {
-    return this.http.patch<ApiResponse<PedidoCreado>>(`${this.apiUrl}/${id}/estado`, { estado }).pipe(
+    return this.http.patch<ApiResponse<PedidoCreado> | PedidoCreado>(`${this.apiUrl}/${id}/estado`, { estado }).pipe(
       map(response => {
-        if (response && response.success) {
+        if (response && 'success' in response && response.success) {
           return response.data;
         }
-        throw new Error(response?.message || 'Error al actualizar el estado del pedido.');
+        if (response && '_id' in response) {
+          return response as PedidoCreado;
+        }
+        throw new Error('Error al actualizar el estado del pedido.');
       })
     );
   }
 
   /**
-   * Actualiza el estado de pago del pedido (Recibido / Pendiente).
-   * @param id ID del pedido
-   * @param pagoRecibido si el pago fue recibido
-   * @param estadoPago Estado textual
+   * Actualiza el estado de pago del pedido.
    */
   updatePagoPedido(id: string, pagoRecibido: boolean, estadoPago?: string): Observable<PedidoCreado> {
-    return this.http.patch<ApiResponse<PedidoCreado>>(`${this.apiUrl}/${id}/pago`, { pagoRecibido, estadoPago }).pipe(
+    return this.http.patch<ApiResponse<PedidoCreado> | PedidoCreado>(`${this.apiUrl}/${id}/pago`, { pagoRecibido, estadoPago }).pipe(
       map(response => {
-        if (response && response.success) {
+        if (response && 'success' in response && response.success) {
           return response.data;
         }
-        throw new Error(response?.message || 'Error al actualizar el pago del pedido.');
+        if (response && '_id' in response) {
+          return response as PedidoCreado;
+        }
+        throw new Error('Error al actualizar el pago del pedido.');
       })
     );
   }
