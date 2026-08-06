@@ -1,80 +1,99 @@
-<div style="padding: 32px; max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+<div style="padding: 2rem; max-width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
     <!-- Encabezado y Botón Superior -->
-    <div
-        style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 16px; gap: 16px;">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 16px; gap: 16px;">
         <div>
             <h1 style="font-size: 24px; font-weight: bold; color: #1a202c; margin: 0;">Gestión de Solicitudes ARCO</h1>
-            <p style="font-size: 14px; color: #718096; margin: 4px 0 0 0;">Supervisa, filtra y da respuesta a las
-                solicitudes de derechos de privacidad de los clientes.</p>
+            <p style="font-size: 14px; color: #718096; margin: 4px 0 0 0;">Supervisa, filtra y da respuesta a las solicitudes de derechos de privacidad de los clientes.</p>
         </div>
-        <button (click)="cargarSolicitudes()">
-            🔄 Actualizar Lista
+        <button (click)="cargarSolicitudes()" style="display: inline-flex; align-items: center; gap: 8px; padding: 0.6rem 1.2rem; background: #ea580c; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6"></path>
+                <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.3L2.5 16"></path>
+            </svg>
+            <span>Actualizar Lista</span>
         </button>
     </div>
 
     <!-- Mensajes de Alerta -->
-    <div *ngIf="successMessage"
-        style="padding: 16px; background: #def7ec; border: 1px solid #a3e635; color: #276749; border-radius: 16px; font-size: 14px;">
-        {{ successMessage }}
+    <div *ngIf="successMessage" style="padding: 16px; background: #def7ec; border: 1px solid #a3e635; color: #276749; border-radius: 16px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>{{ successMessage }}</span>
     </div>
-    <div *ngIf="errorMessage"
-        style="padding: 16px; background: #fde8e8; border: 1px solid #fca5a5; color: #9b2c2c; border-radius: 16px; font-size: 14px;">
-        {{ errorMessage }}
+    <div *ngIf="errorMessage" style="padding: 16px; background: #fde8e8; border: 1px solid #fca5a5; color: #9b2c2c; border-radius: 16px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
     </div>
 
     <!-- Tarjetas de Estadísticas Rápidas -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-        <div
-            style="background: white; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+        <div style="background: white; padding: 20px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
             <div>
-                <p style="font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; margin: 0;">
-                    Pendientes / En Proceso</p>
-                <h3 style="font-size: 24px; font-weight: bold; color: #d69e2e; margin: 4px 0 0 0;">{{ totalPendientes }}
-                </h3>
+                <p style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Pendientes / En Proceso</p>
+                <h3 style="font-size: 26px; font-weight: 800; color: #d69e2e; margin: 4px 0 0 0;">{{ totalPendientes }}</h3>
             </div>
-            <span style="font-size: 24px;">⏳</span>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #fefcbf; color: #d69e2e; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
         </div>
-        <div
-            style="background: white; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+
+        <div style="background: white; padding: 20px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
             <div>
-                <p style="font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; margin: 0;">
-                    Procesadas</p>
-                <h3 style="font-size: 24px; font-weight: bold; color: #38a169; margin: 4px 0 0 0;">{{ totalProcesadas }}
-                </h3>
+                <p style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Procesadas</p>
+                <h3 style="font-size: 26px; font-weight: 800; color: #38a169; margin: 4px 0 0 0;">{{ totalProcesadas }}</h3>
             </div>
-            <span style="font-size: 24px;">✅</span>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #def7ec; color: #38a169; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
         </div>
-        <div
-            style="background: white; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+
+        <div style="background: white; padding: 20px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
             <div>
-                <p style="font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; margin: 0;">
-                    Rechazadas</p>
-                <h3 style="font-size: 24px; font-weight: bold; color: #e53e3e; margin: 4px 0 0 0;">{{ totalRechazadas }}
-                </h3>
+                <p style="font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Rechazadas</p>
+                <h3 style="font-size: 26px; font-weight: 800; color: #e53e3e; margin: 4px 0 0 0;">{{ totalRechazadas }}</h3>
             </div>
-            <span style="font-size: 24px;">❌</span>
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #fde8e8; color: #e53e3e; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
         </div>
     </div>
 
-    <!-- Barra de Filtros y Búsqueda alineados -->
-    <div
-        style="background: white; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: row; gap: 12px; align-items: center; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 260px;">
-            <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
-                placeholder="🔍 Buscar por folio, nombre, correo o teléfono..." style="width: 100%;" />
+    <!-- Barra de Filtros y Búsqueda -->
+    <div style="background: white; padding: 16px 20px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; flex-direction: row; gap: 14px; align-items: center; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 260px; position: relative;">
+            <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Buscar por folio, nombre, correo o teléfono..." style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem; border: 1px solid #cbd5e0; border-radius: 12px; outline: none; font-size: 0.9rem;" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #a0aec0;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
         </div>
+
         <div style="width: 220px;">
-            <select [(ngModel)]="selectedTipo" (ngModelChange)="onTipoFilterChange()" style="width: 100%;">
-                <option value="TODOS">📁 Todos los tipos</option>
+            <select [(ngModel)]="selectedTipo" (ngModelChange)="onTipoFilterChange()" style="width: 100%; padding: 0.65rem 1rem; border: 1px solid #cbd5e0; border-radius: 12px; font-size: 0.9rem; outline: none;">
+                <option value="TODOS">Todos los tipos</option>
                 <option value="ACCESO">Acceso</option>
                 <option value="RECTIFICACION">Rectificación</option>
                 <option value="CANCELACION">Cancelación</option>
                 <option value="OPOSICION">Oposición</option>
             </select>
         </div>
+
         <div style="width: 220px;">
-            <select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoFilterChange()" style="width: 100%;">
-                <option value="TODOS">📊 Todos los estados</option>
+            <select [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoFilterChange()" style="width: 100%; padding: 0.65rem 1rem; border: 1px solid #cbd5e0; border-radius: 12px; font-size: 0.9rem; outline: none;">
+                <option value="TODOS">Todos los estados</option>
                 <option value="Pendiente">Pendiente</option>
                 <option value="Procesada">Procesada</option>
                 <option value="Rechazada">Rechazada</option>
@@ -88,45 +107,42 @@
     </div>
 
     <!-- Tabla de Resultados -->
-    <div *ngIf="!isLoading"
-        style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
-        <table>
+    <div *ngIf="!isLoading" style="background: white; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Titular</th>
-                    <th>Tipo</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th style="text-align: center;">Acciones</th>
+                <tr style="background: #faf4ef; border-bottom: 1px solid #edf2f7;">
+                    <th style="padding: 1rem 1.25rem; text-align: left; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Folio</th>
+                    <th style="padding: 1rem 1.25rem; text-align: left; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Titular</th>
+                    <th style="padding: 1rem 1.25rem; text-align: left; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Tipo</th>
+                    <th style="padding: 1rem 1.25rem; text-align: left; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Estado</th>
+                    <th style="padding: 1rem 1.25rem; text-align: left; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Fecha</th>
+                    <th style="padding: 1rem 1.25rem; text-align: center; font-size: 0.82rem; font-weight: 700; color: #4a382d;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let solicitud of filteredSolicitudes">
-                    <td style="font-family: monospace; font-weight: 600;">{{ getFolioDisplay(solicitud) }}</td>
-                    <td>
-                        <div style="font-weight: 600; color: #1a202c;">{{ solicitud.nombreCompleto || 'Sin nombre' }}
-                        </div>
+                <tr *ngFor="let solicitud of filteredSolicitudes" style="border-bottom: 1px solid #edf2f7;">
+                    <td style="font-family: monospace; font-weight: 700; color: #ea580c; padding: 1rem 1.25rem;">{{ getFolioDisplay(solicitud) }}</td>
+                    <td style="padding: 1rem 1.25rem;">
+                        <div style="font-weight: 700; color: #1a202c;">{{ solicitud.nombreCompleto || 'Sin nombre' }}</div>
                         <div style="font-size: 12px; color: #718096;">{{ solicitud.email }}</div>
                     </td>
-                    <td>
-                        <span
-                            style="font-size: 12px; font-weight: 600; padding: 4px 10px; background: #edf2f7; border-radius: 99px;">
+                    <td style="padding: 1rem 1.25rem;">
+                        <span style="font-size: 12px; font-weight: 600; padding: 4px 10px; background: #edf2f7; border-radius: 99px; color: #4a5568;">
                             {{ getTipoLabel(solicitud.tipo) }}
                         </span>
                     </td>
-                    <td>
-                        <span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px;"
+                    <td style="padding: 1rem 1.25rem;">
+                        <span style="font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px;"
                             [style.color]="solicitud.estado.toLowerCase() === 'procesada' ? '#276749' : (solicitud.estado.toLowerCase() === 'rechazada' ? '#9b2c2c' : '#b7791f')"
                             [style.background]="solicitud.estado.toLowerCase() === 'procesada' ? '#def7ec' : (solicitud.estado.toLowerCase() === 'rechazada' ? '#fde8e8' : '#fef3c7')">
                             {{ solicitud.estado }}
                         </span>
                     </td>
-                    <td style="font-size: 12px; color: #718096;">
+                    <td style="font-size: 12px; color: #718096; padding: 1rem 1.25rem;">
                         {{ solicitud.createdAt | date:'medium' }}
                     </td>
-                    <td style="text-align: center;">
-                        <button (click)="abrirModalGestion(solicitud)" style="padding: 6px 16px; font-size: 12px;">
+                    <td style="text-align: center; padding: 1rem 1.25rem;">
+                        <button (click)="abrirModalGestion(solicitud)" style="padding: 6px 16px; font-size: 12px; font-weight: 700; background: #ea580c; color: white; border: none; border-radius: 8px; cursor: pointer;">
                             Gestionar
                         </button>
                     </td>
@@ -141,39 +157,28 @@
     </div>
 
     <!-- Modal de Gestión -->
-    <div *ngIf="selectedSolicitud"
-        style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100;">
-        <div
-            style="background: white; border-radius: 20px; width: 100%; max-width: 500px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 16px;">
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 12px;">
-                <h3 style="font-weight: bold; font-size: 16px; margin: 0;">Gestionar Solicitud: {{
-                    getFolioDisplay(selectedSolicitud) }}</h3>
-                <button (click)="cerrarModal()"
-                    style="border: none; background: transparent; font-size: 20px; padding: 0; border-radius: 0;">&times;</button>
+    <div *ngIf="selectedSolicitud" style="position: fixed; inset: 0; background: rgba(18, 11, 7, 0.78); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1100;">
+        <div style="background: white; border-radius: 24px; width: 100%; max-width: 520px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 12px;">
+                <h3 style="font-weight: 800; font-size: 17px; margin: 0; color: #3b281c;">Gestionar Solicitud: {{ getFolioDisplay(selectedSolicitud) }}</h3>
+                <button (click)="cerrarModal()" style="border: none; background: #f3eae3; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; color: #6b5548; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
             </div>
 
             <div style="font-size: 14px; color: #4a5568; display: flex; flex-direction: column; gap: 6px;">
                 <p style="margin: 0;"><strong>Titular:</strong> {{ selectedSolicitud.nombreCompleto }}</p>
                 <p style="margin: 0;"><strong>Correo:</strong> {{ selectedSolicitud.email }}</p>
-                <p style="margin: 0;"><strong>Teléfono:</strong> {{ selectedSolicitud.telefono || 'No proporcionado' }}
-                </p>
-                <p style="margin: 0;"><strong>Derecho:</strong> <span
-                        style="text-transform: uppercase; font-weight: 600;">{{ getTipoLabel(selectedSolicitud.tipo)
-                        }}</span></p>
-                <div style="margin-top: 4px; background: #f7fafc; padding: 10px; border-radius: 10px;">
-                    <strong style="display: block; margin-bottom: 2px;">Detalle:</strong>
-                    <p style="margin: 0; font-style: italic; color: #718096;">{{ selectedSolicitud.detalleSolicitud ||
-                        'Sin detalles' }}</p>
+                <p style="margin: 0;"><strong>Teléfono:</strong> {{ selectedSolicitud.telefono || 'No proporcionado' }}</p>
+                <p style="margin: 0;"><strong>Derecho:</strong> <span style="text-transform: uppercase; font-weight: 700; color: #ea580c;">{{ getTipoLabel(selectedSolicitud.tipo) }}</span></p>
+                <div style="margin-top: 4px; background: #faf4ef; padding: 12px; border-radius: 12px; border: 1px solid #f0e6df;">
+                    <strong style="display: block; margin-bottom: 2px; color: #3b281c;">Detalle:</strong>
+                    <p style="margin: 0; font-style: italic; color: #6b5548;">{{ selectedSolicitud.detalleSolicitud || 'Sin detalles' }}</p>
                 </div>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div>
-                    <label
-                        style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #718096; margin-bottom: 4px;">Nuevo
-                        Estado</label>
-                    <select [(ngModel)]="modalEstado" style="width: 100%;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #4a382d; margin-bottom: 4px;">Nuevo Estado</label>
+                    <select [(ngModel)]="modalEstado" style="width: 100%; padding: 0.65rem 1rem; border: 1px solid #cbd5e0; border-radius: 10px; outline: none; font-size: 0.9rem;">
                         <option value="Pendiente">Pendiente</option>
                         <option value="Procesada">Procesada</option>
                         <option value="Rechazada">Rechazada</option>
@@ -181,24 +186,16 @@
                 </div>
 
                 <div>
-                    <label
-                        style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #718096; margin-bottom: 4px;">Respuesta
-                        Administrativa</label>
-                    <textarea [(ngModel)]="modalRespuesta" rows="3"
-                        placeholder="Escribe la respuesta formal para el titular..."
-                        style="width: 100%; border: 1px solid #cbd5e0; border-radius: 12px; padding: 10px 14px; font-size: 14px; outline: none; box-sizing: border-box;">
-          </textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #4a382d; margin-bottom: 4px;">Respuesta Administrativa</label>
+                    <textarea [(ngModel)]="modalRespuesta" rows="3" placeholder="Escribe la respuesta formal para el titular..." style="width: 100%; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; outline: none; box-sizing: border-box;"></textarea>
                 </div>
             </div>
 
-            <div
-                style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #edf2f7; padding-top: 16px;">
-                <button (click)="cerrarModal()" [disabled]="isSaving"
-                    style="background: #edf2f7; border-color: #cbd5e0; color: #4a5568;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #edf2f7; padding-top: 16px;">
+                <button (click)="cerrarModal()" [disabled]="isSaving" style="background: #f3eae3; color: #6b5548; border: none; padding: 0.65rem 1.25rem; border-radius: 10px; font-weight: 700; cursor: pointer;">
                     Cancelar
                 </button>
-                <button (click)="guardarGestion()" [disabled]="isSaving"
-                    style="background: #dd6b20; color: white; border-color: #dd6b20;">
+                <button (click)="guardarGestion()" [disabled]="isSaving" style="background: linear-gradient(135deg, #ea580c, #c2410c); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);">
                     {{ isSaving ? 'Guardando...' : 'Guardar y Responder' }}
                 </button>
             </div>

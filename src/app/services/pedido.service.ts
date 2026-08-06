@@ -8,6 +8,7 @@ export interface PedidoItem {
   id_producto: string;
   cantidad: number;
   precio_unitario: number;
+  nombre?: string;
 }
 
 export interface PedidoCliente {
@@ -34,6 +35,10 @@ export interface PedidoCreado {
   productos_solicitados: PedidoItem[];
   total: number;
   estado: string;
+  pago_recibido?: boolean;
+  pagoRecibido?: boolean;
+  estado_pago?: string;
+  estadoPago?: string;
   createdAt: string;
   metodoPago?: string;
   metodoEntrega?: string;
@@ -48,7 +53,6 @@ export interface PedidoCreado {
 })
 export class PedidoService {
   private readonly http = inject(HttpClient);
-  // Endpoint de acuerdo a los requerimientos
   private readonly apiUrl = `${environment.apiUrl}/pedidos`;
 
   /**
@@ -95,25 +99,21 @@ export class PedidoService {
       })
     );
   }
-}
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { EstadoPedido, Pedido } from '../models/pedido.model';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class PedidoService {
-  private readonly API_URL = 'http://localhost:3000/api/v1/pedidos';
-
-  constructor(private http: HttpClient) {}
-
-  obtenerPedidos(): Observable<Pedido[]> {
-    return this.http.get<Pedido[]>(this.API_URL);
-  }
-
-  actualizarEstado(id: string, estado: EstadoPedido): Observable<Pedido> {
-    return this.http.patch<Pedido>(`${this.API_URL}/${id}/estado`, { estado });
+  /**
+   * Actualiza el estado de pago del pedido (Recibido / Pendiente).
+   * @param id ID del pedido
+   * @param pagoRecibido si el pago fue recibido
+   * @param estadoPago Estado textual
+   */
+  updatePagoPedido(id: string, pagoRecibido: boolean, estadoPago?: string): Observable<PedidoCreado> {
+    return this.http.patch<ApiResponse<PedidoCreado>>(`${this.apiUrl}/${id}/pago`, { pagoRecibido, estadoPago }).pipe(
+      map(response => {
+        if (response && response.success) {
+          return response.data;
+        }
+        throw new Error(response?.message || 'Error al actualizar el pago del pedido.');
+      })
+    );
   }
 }
