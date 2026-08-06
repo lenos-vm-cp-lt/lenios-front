@@ -1,13 +1,33 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { ApiResponse } from '../models/api-response.model';
+
+export interface UserInfo {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  telefono?: string;
+  ubicacion?: string;
+  avisoPrivacidadAceptado?: boolean;
+  fechaAceptacionAviso?: string | Date | null;
+}
 
 export interface AuthResponseData {
   token: string;
   usuario?: any;
   user?: any;
+}
+
+export interface RegisterPayload {
+  nombre: string;
+  email: string;
+  password: string;
+  telefono?: string;
+  ubicacion?: string;
+  avisoPrivacidadAceptado?: boolean;
 }
 
 /**
@@ -25,16 +45,21 @@ export class AuthService {
 
   /**
    * Realiza una petición HTTP POST al backend para iniciar sesión.
-   * Evalúa response.success y retorna únicamente la propiedad response.data.
    * @param email Correo electrónico del usuario
    * @param password Contraseña del usuario
-   * @returns Observable con los datos de negocio autenticados (token y datos del usuario)
+   * @returns Observable con los datos de negocio autenticados
    */
   login(email: string, password: string): Observable<AuthResponseData> {
     return this.http.post<ApiResponse<AuthResponseData>>(`${this.API_URL}/auth/login`, { email, password }).pipe(
       map(response => {
         if (response && response.success) {
-          return response.data;
+          const data = response.data;
+          this.setToken(data.token);
+          const userData = data.usuario || data.user;
+          if (userData) {
+            this.setUserInfo(userData);
+          }
+          return data;
         }
         throw new Error(response?.message || 'Falló el inicio de sesión.');
       })
@@ -42,8 +67,56 @@ export class AuthService {
   }
 
   /**
+   * Registra un nuevo usuario en el sistema.
+   * @param payload Datos del registro de usuario
+   */
+  registro(payload: RegisterPayload): Observable<AuthResponseData> {
+    return this.http.post<ApiResponse<AuthResponseData>>(`${this.API_URL}/auth/registro`, payload).pipe(
+      map(response => {
+        if (response && response.success) {
+          const data = response.data;
+          this.setToken(data.token);
+          const userData = data.usuario || data.user;
+          if (userData) {
+            this.setUserInfo(userData);
+          }
+          return data;
+        }
+        throw new Error(response?.message || 'Falló el registro de usuario.');
+      })
+    );
+  }
+
+  /**
+   * Registra la aceptación del aviso de privacidad en el backend.
+   */
+  aceptarAvisoPrivacidad(): Observable<any> {
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}/auth/aceptar-aviso`, {}).pipe(
+      map(response => {
+        if (response && response.success) {
+          this.updatePrivacyStatus(true);
+          return response.data;
+        }
+        throw new Error(response?.message || 'No se pudo registrar la aceptación del aviso.');
+      })
+    );
+  }
+
+  /**
+   * Obtiene la información actualizada del perfil del usuario autenticado.
+   */
+  getPerfil(): Observable<any> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/auth/me`).pipe(
+      tap(response => {
+        if (response && response.success && response.data?.usuario) {
+          this.setUserInfo(response.data.usuario);
+        }
+      })
+    );
+  }
+
+  /**
    * Obtiene el token JWT guardado en localStorage.
-   * @returns El token JWT como string o null si no existe.
    */
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -51,7 +124,6 @@ export class AuthService {
 
   /**
    * Guarda un token JWT en localStorage.
-   * @param token Token JWT recibido tras iniciar sesión.
    */
   setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
@@ -59,11 +131,32 @@ export class AuthService {
 
   /**
    * Determina si el usuario actual posee un token JWT válido.
-   * @returns boolean Verdadero si existe un token no vacío.
    */
   isAuthenticated(): boolean {
     const token = this.getToken();
     return !!token && token.trim().length > 0;
+  }
+
+  /**
+   * Comprueba si el usuario ha aceptado previamente el Aviso de Privacidad.
+   */
+  hasAcceptedPrivacy(): boolean {
+    const user = this.getUserInfo();
+    return !!user && user.avisoPrivacidadAceptado === true;
+  }
+
+  /**
+   * Actualiza únicamente el estado de aceptación del Aviso de Privacidad en el almacenamiento local.
+   */
+  updatePrivacyStatus(accepted: boolean): void {
+    const user = this.getUserInfo();
+    if (user) {
+      user.avisoPrivacidadAceptado = accepted;
+      if (accepted) {
+        user.fechaAceptacionAviso = new Date().toISOString();
+      }
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    }
   }
 
   /**
@@ -75,14 +168,18 @@ export class AuthService {
   }
 
   /**
-   * Almacena información básica del usuario autenticado.
+   * Almacena información del usuario autenticado en localStorage.
    */
   setUserInfo(user: any): void {
-    const formattedUser = {
+    const formattedUser: UserInfo = {
       id: user.id || user._id,
       email: user.email,
       name: user.name || user.nombre || 'Usuario',
-      role: user.role || user.rol || 'Usuario'
+      role: user.role || user.rol || 'Cliente',
+      telefono: user.telefono || user.phone || '',
+      ubicacion: user.ubicacion || user.direccion || user.address || '',
+      avisoPrivacidadAceptado: !!user.avisoPrivacidadAceptado,
+      fechaAceptacionAviso: user.fechaAceptacionAviso || null
     };
     localStorage.setItem(this.USER_KEY, JSON.stringify(formattedUser));
   }
@@ -90,7 +187,7 @@ export class AuthService {
   /**
    * Retorna la información guardada del usuario autenticado.
    */
-  getUserInfo(): any {
+  getUserInfo(): UserInfo | null {
     const userStr = localStorage.getItem(this.USER_KEY);
     if (!userStr) return null;
     try {

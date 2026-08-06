@@ -49,7 +49,11 @@
   padding: 0;
 }
 
-html, body {
+html {
+  scroll-behavior: smooth;
+}
+
+body {
   height: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--color-bg-main);
@@ -65,21 +69,95 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
 }
 
-/* Scrollbar personalizado */
+/* ─── Scrollbar Inset Ultra-Elegante (Evita desbordamientos en esquinas) ───────────── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-main);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-brown-soft);
-  border-radius: 4px;
+  background-color: #ea580c;
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.25s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-orange-primary);
+  background-color: #f97316;
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ea580c transparent;
+}
+
+/* ─── Transiciones y Animaciones Suaves UI/UX ────────────────────────────── */
+
+/* Transición suave para todos los overlays de modales y drawers */
+.modal-overlay, .privacy-overlay, .cart-drawer-overlay {
+  animation: smoothOverlayFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes smoothOverlayFade {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Transición suave para tarjetas de modales */
+.modal-card, .modal-content, .privacy-card {
+  animation: smoothModalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-radius: 24px !important;
+}
+
+@keyframes smoothModalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Desplazamiento fluido para el Drawer lateral del carrito */
+.cart-drawer-content {
+  animation: smoothDrawerSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes smoothDrawerSlide {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Resplandor y elevación suave para botones */
+button, .btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active:not(:disabled), .btn:active:not(:disabled) {
+  transform: scale(0.97) translateY(0) !important;
+}
+
+/* Enfoque animado suave para controles de formulario */
+input:focus, select:focus, textarea:focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }

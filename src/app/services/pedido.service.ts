@@ -8,6 +8,7 @@ export interface PedidoItem {
   id_producto: string;
   cantidad: number;
   precio_unitario: number;
+  nombre?: string;
 }
 
 export interface PedidoCliente {
@@ -23,6 +24,7 @@ export interface PedidoPayload {
   metodoPago: string;
   metodoEntrega: string;
   notas?: string;
+  consentimiento: boolean;
 }
 
 export interface PedidoCreado {
@@ -33,9 +35,16 @@ export interface PedidoCreado {
   productos_solicitados: PedidoItem[];
   total: number;
   estado: string;
+  pago_recibido?: boolean;
+  pagoRecibido?: boolean;
+  estado_pago?: string;
+  estadoPago?: string;
   createdAt: string;
-  metodoPago: string;
-  metodoEntrega: string;
+  metodoPago?: string;
+  metodoEntrega?: string;
+  metodo_pago?: string;
+  metodo_entrega?: string;
+  metodo_envio?: string;
   notas?: string;
 }
 
@@ -44,7 +53,6 @@ export interface PedidoCreado {
 })
 export class PedidoService {
   private readonly http = inject(HttpClient);
-  // Endpoint de acuerdo a los requerimientos
   private readonly apiUrl = `${environment.apiUrl}/pedidos`;
 
   /**
@@ -88,6 +96,23 @@ export class PedidoService {
           return response.data;
         }
         throw new Error(response?.message || 'Error al actualizar el estado del pedido.');
+      })
+    );
+  }
+
+  /**
+   * Actualiza el estado de pago del pedido (Recibido / Pendiente).
+   * @param id ID del pedido
+   * @param pagoRecibido si el pago fue recibido
+   * @param estadoPago Estado textual
+   */
+  updatePagoPedido(id: string, pagoRecibido: boolean, estadoPago?: string): Observable<PedidoCreado> {
+    return this.http.patch<ApiResponse<PedidoCreado>>(`${this.apiUrl}/${id}/pago`, { pagoRecibido, estadoPago }).pipe(
+      map(response => {
+        if (response && response.success) {
+          return response.data;
+        }
+        throw new Error(response?.message || 'Error al actualizar el pago del pedido.');
       })
     );
   }

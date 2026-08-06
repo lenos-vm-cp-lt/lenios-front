@@ -34,6 +34,7 @@ export class ProductService {
   private mapToFrontend(item: BackendProduct): Product {
     return {
       id: item._id,
+      _id: item._id,
       name: item.nombre,
       description: item.descripcion || '',
       price: item.precio,

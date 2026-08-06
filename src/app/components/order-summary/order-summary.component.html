@@ -119,35 +119,254 @@
           }
         </div>
 
-        <div class="form-group">
-          <label for="ubicacion">Dirección de Entrega *</label>
-          <input type="text" id="ubicacion" formControlName="ubicacion" placeholder="Ej. Calle Hidalgo #123, Col. Centro" />
-          @if (checkoutForm.get('ubicacion')?.invalid && checkoutForm.get('ubicacion')?.touched) {
-            <span class="error-msg">La dirección es requerida</span>
-          }
-        </div>
-
         <div class="form-row">
           <div class="form-group half">
-            <label for="metodoEntrega">Método de Entrega</label>
+            <label for="metodoEntrega">Método de Entrega *</label>
             <select id="metodoEntrega" formControlName="metodoEntrega">
               <option value="A domicilio">A domicilio</option>
-              <option value="Pasar a recoger">Pasar a recoger</option>
+              <option value="Recoger en tienda">Recoger en tienda</option>
             </select>
           </div>
           <div class="form-group half">
-            <label for="metodoPago">Método de Pago</label>
+            <label for="metodoPago">Método de Pago *</label>
             <select id="metodoPago" formControlName="metodoPago">
-              <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Tarjeta">Tarjeta</option>
+              @if (checkoutForm.get('metodoEntrega')?.value === 'A domicilio') {
+                <option value="Efectivo">Efectivo al Entregar (al repartidor)</option>
+                <option value="Tarjeta">Tarjeta (Crédito / Débito)</option>
+                <option value="Transferencia">Transferencia SPEI</option>
+                <option value="OXXO / Depósito">OXXO Pay / Depósito</option>
+              } @else {
+                <option value="Efectivo">Efectivo en Tienda Física (al recoger)</option>
+                <option value="Tarjeta">Tarjeta (Crédito / Débito en sucursal)</option>
+                <option value="Transferencia">Transferencia SPEI</option>
+                <option value="OXXO / Depósito">OXXO Pay / Depósito</option>
+              }
             </select>
           </div>
         </div>
+
+        <!-- Secciones dinámicas por Método de Pago -->
+        @if (checkoutForm.get('metodoPago')?.value === 'Tarjeta') {
+          <div class="payment-box card-payment-box">
+            <div class="payment-box-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: #ea580c;">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+              <strong>Datos de la Tarjeta de Crédito / Débito</strong>
+            </div>
+
+            <div class="form-group">
+              <label for="tarjetaNumero">Número de Tarjeta *</label>
+              <input 
+                type="text" 
+                id="tarjetaNumero" 
+                formControlName="tarjetaNumero" 
+                placeholder="1234 5678 9012 3456" 
+                maxlength="19" />
+              @if (checkoutForm.get('tarjetaNumero')?.invalid && checkoutForm.get('tarjetaNumero')?.touched) {
+                <span class="error-msg">Ingresa un número de tarjeta válido (16 dígitos)</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="tarjetaExp">Vencimiento (MM/AA) *</label>
+                <input 
+                  type="text" 
+                  id="tarjetaExp" 
+                  formControlName="tarjetaExp" 
+                  placeholder="12/28" 
+                  maxlength="5" />
+                @if (checkoutForm.get('tarjetaExp')?.invalid && checkoutForm.get('tarjetaExp')?.touched) {
+                  <span class="error-msg">Formato MM/AA</span>
+                }
+              </div>
+
+              <div class="form-group half">
+                <label for="tarjetaCvc">CVC / CVV *</label>
+                <input 
+                  type="password" 
+                  id="tarjetaCvc" 
+                  formControlName="tarjetaCvc" 
+                  placeholder="123" 
+                  maxlength="4" />
+                @if (checkoutForm.get('tarjetaCvc')?.invalid && checkoutForm.get('tarjetaCvc')?.touched) {
+                  <span class="error-msg">3 o 4 dígitos</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tarjetaNombre">Nombre en la Tarjeta *</label>
+              <input 
+                type="text" 
+                id="tarjetaNombre" 
+                formControlName="tarjetaNombre" 
+                placeholder="Tal como aparece en el plástico" />
+              @if (checkoutForm.get('tarjetaNombre')?.invalid && checkoutForm.get('tarjetaNombre')?.touched) {
+                <span class="error-msg">Nombre del titular requerido</span>
+              }
+            </div>
+
+            <div class="security-badge-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color: #16a34a;">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Pago 100% seguro encriptado con SSL de 256 bits</span>
+            </div>
+          </div>
+        } @else if (checkoutForm.get('metodoPago')?.value === 'Transferencia') {
+          <div class="payment-box bank-transfer-box">
+            <div class="payment-box-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: #0284c7;">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <strong>Datos Bancarios para Transferencia SPEI</strong>
+            </div>
+            
+            <div class="bank-details-grid">
+              <div class="bank-detail-item">
+                <span class="detail-label">Banco:</span>
+                <span class="detail-value">BBVA México</span>
+              </div>
+              <div class="bank-detail-item">
+                <span class="detail-label">Beneficiario:</span>
+                <span class="detail-value">Leños Rellenos S.A.</span>
+              </div>
+              <div class="bank-detail-item clabe-item">
+                <span class="detail-label">CLABE Interbancaria:</span>
+                <div class="clabe-copy-row">
+                  <strong class="clabe-number">012 320 00123456789 0</strong>
+                  <button type="button" class="copy-clabe-btn" (click)="copyClabe()" title="Copiar CLABE">
+                    {{ clabeCopied ? '¡Copiado!' : 'Copiar CLABE' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p class="payment-note-text">
+              💡 Envía una captura de tu comprobante por WhatsApp al confirmar para iniciar tu pedido.
+            </p>
+          </div>
+        } @else if (checkoutForm.get('metodoPago')?.value === 'OXXO / Depósito') {
+          <div class="payment-box oxxo-box">
+            <div class="payment-box-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: #dc2626;">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <strong>Pago en Efectivo OXXO Pay / Tiendas</strong>
+            </div>
+
+            <div class="oxxo-ref-card">
+              <span class="oxxo-ref-label">Número de Referencia OXXO Pay:</span>
+              <span class="oxxo-ref-code">1234 - 5678 - 9012 - 3456</span>
+              <span class="oxxo-amount">Monto a pagar: <strong>{{ total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+            </div>
+
+            <p class="payment-note-text">
+              🏪 Muestra este número en caja OXXO. Tu pedido se preparará en cuanto recibamos la notificación del depósito.
+            </p>
+          </div>
+        } @else {
+          <div class="payment-box cash-box">
+            <div class="payment-box-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: #16a34a;">
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <circle cx="12" cy="12" r="2"></circle>
+                <path d="M6 12h.01M18 12h.01"></path>
+              </svg>
+              <strong>{{ checkoutForm.get('metodoEntrega')?.value === 'A domicilio' ? 'Pago en Efectivo al Entregar' : 'Pago en Efectivo en Tienda Física' }}</strong>
+            </div>
+
+            <div class="form-group">
+              <label for="cambioBilletes">¿Con qué billete vas a pagar? (Opcional)</label>
+              <input 
+                type="text" 
+                id="cambioBilletes" 
+                formControlName="cambioBilletes" 
+                placeholder="Ej. Pagaré con billete de $200 / $500" />
+            </div>
+
+            <p class="payment-note-text">
+              💵 {{ checkoutForm.get('metodoEntrega')?.value === 'A domicilio' ? 'Pagarás en efectivo al recibir tu pedido con el repartidor.' : 'Pagarás en efectivo al recoger tu pedido en caja de la tienda física.' }}
+            </p>
+          </div>
+        }
+
+        @if (checkoutForm.get('metodoEntrega')?.value === 'A domicilio') {
+          <div class="address-selection-box">
+            <label class="form-section-label">Dirección de Entrega *</label>
+
+            @if (registeredAddress) {
+              <div class="address-options-grid">
+                <label class="address-radio-card" [class.active-card]="useRegisteredAddress" (click)="onAddressModeChange(true)">
+                  <div class="radio-header">
+                    <input 
+                      type="radio" 
+                      name="addressMode" 
+                      [checked]="useRegisteredAddress" 
+                      (change)="onAddressModeChange(true)" />
+                    <strong>📍 Dirección Registrada</strong>
+                  </div>
+                  <p class="registered-address-text">{{ registeredAddress }}</p>
+                </label>
+
+                <label class="address-radio-card" [class.active-card]="!useRegisteredAddress" (click)="onAddressModeChange(false)">
+                  <div class="radio-header">
+                    <input 
+                      type="radio" 
+                      name="addressMode" 
+                      [checked]="!useRegisteredAddress" 
+                      (change)="onAddressModeChange(false)" />
+                    <strong>✏️ Entregar en Otra Dirección</strong>
+                  </div>
+                  <p class="registered-address-text">Ingresa una nueva dirección para este pedido</p>
+                </label>
+              </div>
+            }
+
+            @if (!registeredAddress || !useRegisteredAddress) {
+              <div class="form-group" style="margin-top: 0.5rem;">
+                <label for="ubicacion">Escribe la Nueva Dirección de Entrega *</label>
+                <input type="text" id="ubicacion" formControlName="ubicacion" placeholder="Ej. Calle Hidalgo #123, Col. Centro" />
+                @if (checkoutForm.get('ubicacion')?.invalid && checkoutForm.get('ubicacion')?.touched) {
+                  <span class="error-msg">La dirección de entrega es requerida</span>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="pickup-info-banner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <div>
+              <strong>Recogida en tienda física (Sucursal)</strong>
+              <p>Te avisaremos cuando tu pedido esté listo para ser recogido en mostrador.</p>
+            </div>
+          </div>
+        }
 
         <div class="form-group">
           <label for="notas">Notas Adicionales</label>
           <textarea id="notas" formControlName="notas" placeholder="Ej. Sin cebolla, salsa aparte..." rows="2"></textarea>
+        </div>
+
+        <div class="privacy-info-note" style="margin-top: 12px; font-size: 0.8rem; color: #7c685b; display: flex; align-items: center; gap: 5px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color: #ea580c; flex-shrink: 0;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Tus datos están protegidos bajo nuestro</span>
+          <button type="button" (click)="openPrivacyModal()" style="background: none; border: none; color: #ea580c; text-decoration: underline; font-weight: 600; cursor: pointer; padding: 0;">
+            Aviso de Privacidad
+          </button>
         </div>
       </form>
     } @else {
@@ -197,12 +416,6 @@
           <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
         <span>Agrega al menos un producto para proceder con la confirmación.</span>
-      </div>
-    }
-
-    @if (step === 'checkout') {
-      <div class="privacy-consent">
-        <p>Al realizar tu pedido, aceptas nuestro <button type="button" class="link-btn" (click)="openPrivacyModal()">Aviso de Privacidad</button>.</p>
       </div>
     }
 
@@ -260,5 +473,24 @@
         </div>
       </div>
     </div>
+  }
+
+  <!-- Modal de Autenticación / Registro para Clientes -->
+  @if (showAuthModal) {
+    <app-auth-modal
+      (close)="showAuthModal = false"
+      (loginSuccess)="onAuthSuccess()"
+      (requestPrivacyView)="showAuthModal = false; openPrivacyModal()"
+    />
+  }
+
+  <!-- Modal Obligatorio de Aceptación del Aviso de Privacidad -->
+  @if (showMandatoryPrivacyModal) {
+    <app-privacy-modal
+      [mandatory]="true"
+      (accepted)="onPrivacyAccepted()"
+      (rejected)="onPrivacyRejected()"
+      (close)="showMandatoryPrivacyModal = false"
+    />
   }
 </div>

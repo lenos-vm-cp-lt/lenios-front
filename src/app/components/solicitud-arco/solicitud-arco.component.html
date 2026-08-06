@@ -3,14 +3,18 @@
   <header class="arco-header">
     <div class="header-container">
       <div class="brand-title" routerLink="/">
-        <span class="logo">🔥</span>
+        <span class="logo">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </span>
         <div>
           <h1>Leños Rellenos</h1>
           <span class="subtitle">Protección de Datos Personales</span>
         </div>
       </div>
       <a routerLink="/" class="btn-back">
-        ← Volver al Inicio
+        &larr; Volver al Inicio
       </a>
     </div>
   </header>
@@ -18,7 +22,11 @@
   <main class="arco-container">
     <!-- Banner Informativo ARCO -->
     <section class="info-banner">
-      <div class="info-icon">🛡️</div>
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="26" height="26">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
       <div class="info-content">
         <h2>Ejercicio de Derechos ARCO</h2>
         <p>
@@ -38,7 +46,13 @@
 
       <!-- Alerta de Error de API -->
       <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        <span class="alert-icon">⚠️</span>
+        <span class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </span>
         <div class="alert-text">
           <strong>Error al enviar la solicitud:</strong>
           <p>{{ errorMessage }}</p>
@@ -174,7 +188,11 @@
     <!-- ESTADO 2: Tarjeta de Éxito con Folio Único (201 Created) -->
     <div *ngIf="respuestaExito" class="success-card">
       <div class="success-header">
-        <div class="success-icon-badge">✅</div>
+        <div class="success-icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="28" height="28">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
         <h2>¡Solicitud Registrada con Éxito!</h2>
         <p class="success-subtitle">
           Tu requerimiento de derechos ARCO ha sido recibido correctamente por nuestro oficial de privacidad.
@@ -186,8 +204,8 @@
         <div class="folio-value-container">
           <span class="folio-number">{{ respuestaExito.folio }}</span>
           <button type="button" class="btn-copy" (click)="copiarFolio()">
-            <span *ngIf="!copiedFolio">📋 Copiar</span>
-            <span *ngIf="copiedFolio">✓ ¡Copiado!</span>
+            <span *ngIf="!copiedFolio">Copiar</span>
+            <span *ngIf="copiedFolio">&check; ¡Copiado!</span>
           </button>
         </div>
         <p class="folio-hint">Conserva este folio para consultar el estado o realizar aclaraciones sobre tu trámite.</p>
@@ -214,10 +232,10 @@
 
       <div class="success-actions">
         <button type="button" class="btn-secondary" (click)="nuevaSolicitud()">
-          ✍️ Realizar Otra Solicitud
+          Realizar Otra Solicitud
         </button>
         <button type="button" class="btn-primary" routerLink="/">
-          🏠 Volver al Inicio
+          Volver al Inicio
         </button>
       </div>
     </div>

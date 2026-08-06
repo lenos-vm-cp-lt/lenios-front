@@ -48,6 +48,10 @@ export const routes: Routes = [
       {
         path: 'pedidos',
         loadComponent: () => import('./components/admin/admin-pedidos/admin-pedidos.component').then(m => m.AdminPedidosComponent)
+      },
+      {
+        path: 'solicitudes-arco',
+        loadComponent: () => import('./components/admin/solicitudes-arco/admin-solicitudes-arco.component').then(m => m.AdminSolicitudesArcoComponent)
       }
     ]
   },
