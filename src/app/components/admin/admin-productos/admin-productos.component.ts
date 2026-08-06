@@ -22,13 +22,21 @@ import { FormularioProductoComponent } from './formulario-producto.component';
       <!-- Alertas de estado -->
       @if (successMessage) {
         <div class="alert alert-success" role="alert">
-          <span>✅ {{ successMessage }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ successMessage }}</span>
         </div>
       }
 
       @if (errorMessage) {
         <div class="alert alert-danger" role="alert">
-          <span>⚠️ {{ errorMessage }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ errorMessage }}</span>
         </div>
       }
 
@@ -36,8 +44,12 @@ import { FormularioProductoComponent } from './formulario-producto.component';
       <div class="card table-card">
         <div class="table-header-row">
           <h2>Catálogo de Productos Activos</h2>
-          <button class="btn btn-primary" (click)="openAddModal()">
-            ➕ Agregar Producto
+          <button class="btn btn-primary" (click)="openAddModal()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Agregar Producto
           </button>
         </div>
 
@@ -99,7 +111,12 @@ import { FormularioProductoComponent } from './formulario-producto.component';
                     @for (prod of filteredProducts; track prod.id) {
                       <tr>
                         <td>
-                          <img [src]="prod.imageUrl || 'assets/images/placeholder.webp'" [alt]="prod.name" class="thumb-img" />
+                          <img 
+                            [src]="prod.imageUrl || 'assets/images/placeholder.webp'" 
+                            [alt]="prod.name" 
+                            class="thumb-img" 
+                            (click)="openImageZoom(prod.imageUrl || 'assets/images/placeholder.webp', prod.name)"
+                            title="Clic para ver en pantalla completa" />
                         </td>
                         <td><strong>{{ prod.name }}</strong></td>
                         <td><span class="badge-cat">{{ prod.category || 'General' }}</span></td>
@@ -126,8 +143,20 @@ import { FormularioProductoComponent } from './formulario-producto.component';
                         </td>
                         <td>
                           <div class="action-buttons">
-                            <button class="btn-sm btn-edit" (click)="openEditModal(prod)">✏️ Editar</button>
-                            <button class="btn-sm btn-delete" (click)="deleteProduct(prod.id)">🗑️ Eliminar</button>
+                            <button class="btn-sm btn-edit" (click)="openEditModal(prod)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              <span>Editar</span>
+                            </button>
+                            <button class="btn-sm btn-delete" (click)="deleteProduct(prod.id)">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                              <span>Eliminar</span>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -149,6 +178,20 @@ import { FormularioProductoComponent } from './formulario-producto.component';
       (closeModal)="closeModal()"
       (save)="saveProduct($event)">
     </app-formulario-producto>
+
+    <!-- Lightbox Modal de Imagen Completa -->
+    @if (zoomImageUrl) {
+      <div class="lightbox-overlay" (click)="zoomImageUrl = null" tabindex="0" (keydown.escape)="zoomImageUrl = null">
+        <div class="lightbox-card" (click)="$event.stopPropagation()">
+          <button type="button" class="lightbox-close-btn" (click)="zoomImageUrl = null" title="Cerrar vista completa">&times;</button>
+          <img [src]="zoomImageUrl" [alt]="zoomImageTitle" class="lightbox-img" />
+          <div class="lightbox-caption">
+            <strong>{{ zoomImageTitle }}</strong>
+            <span>Vista completa en alta resolución</span>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .page-container { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -304,6 +347,92 @@ import { FormularioProductoComponent } from './formulario-producto.component';
       padding: 3rem 1.5rem;
       color: var(--color-text-muted);
     }
+
+    .thumb-img {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .thumb-img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* ─── Lightbox Modal Styles ─────────────────────────────────────────── */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 7, 4, 0.92);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 2rem;
+      outline: none;
+    }
+
+    .lightbox-card {
+      position: relative;
+      background: #2b1b0e;
+      border-radius: 24px;
+      padding: 1rem;
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(234, 88, 12, 0.3);
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ea580c;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    .lightbox-close-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .lightbox-img {
+      max-width: 80vw;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .lightbox-caption {
+      margin-top: 0.85rem;
+      text-align: center;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .lightbox-caption strong {
+      font-size: 1.1rem;
+      color: #f97316;
+    }
+
+    .lightbox-caption span {
+      font-size: 0.8rem;
+      color: #d1d5db;
+    }
   `]
 })
 export class GestionProductosComponent implements OnInit {
@@ -320,10 +449,18 @@ export class GestionProductosComponent implements OnInit {
   isModalOpen = false;
   selectedProduct: Product | null = null;
 
+  zoomImageUrl: string | null = null;
+  zoomImageTitle = '';
+
   // Filtros
   searchQuery = '';
   selectedCategory = '';
   selectedStatus = 'Todos';
+
+  openImageZoom(url: string, title: string): void {
+    this.zoomImageUrl = url;
+    this.zoomImageTitle = title;
+  }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -363,9 +500,13 @@ export class GestionProductosComponent implements OnInit {
         this.products = productsList;
         this.isLoading = false;
       },
-      error: (err: Error) => {
+      error: (err: any) => {
         console.error('Error al cargar catálogo:', err);
-        this.errorMessage = err.message || 'Error al obtener la lista de productos.';
+        if (err.status === 403) {
+          this.errorMessage = 'Acceso denegado (403): Tu cuenta no posee permisos de administrador (requiere rol admin o editor).';
+        } else {
+          this.errorMessage = err.message || 'Error al obtener la lista de productos.';
+        }
         this.isLoading = false;
       }
     });

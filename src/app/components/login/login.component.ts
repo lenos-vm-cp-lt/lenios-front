@@ -16,14 +16,22 @@ import { AuthService } from '../../services/auth.service';
     <div class="login-wrapper">
       <div class="login-card">
         <div class="brand-header">
-          <div class="logo">🔥</div>
+          <div class="logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="30" height="30" style="color: var(--color-orange-primary);">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+          </div>
           <h1>Leños Rellenos</h1>
           <p>Portal Administrativo</p>
         </div>
 
         <form (ngSubmit)="onLogin()" class="login-form">
           <div *ngIf="errorMessage" class="error-alert" role="alert">
-            <span class="error-icon">⚠️</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             <span>{{ errorMessage }}</span>
           </div>
 
@@ -42,15 +50,35 @@ import { AuthService } from '../../services/auth.service';
 
           <div class="form-group">
             <label for="password">Contraseña</label>
-            <input 
-              id="password" 
-              type="password" 
-              [(ngModel)]="password" 
-              name="password" 
-              required 
-              [disabled]="isLoading"
-              placeholder="••••••••" 
-              class="form-control" />
+            <div class="password-input-wrapper" style="position: relative; display: flex; align-items: center;">
+              <input 
+                id="password" 
+                [type]="showPassword ? 'text' : 'password'" 
+                [(ngModel)]="password" 
+                name="password" 
+                required 
+                [disabled]="isLoading"
+                placeholder="••••••••" 
+                class="form-control" 
+                style="width: 100%; padding-right: 2.75rem;" />
+              <button 
+                type="button" 
+                (click)="showPassword = !showPassword" 
+                [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                style="position: absolute; right: 0.75rem; background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem; display: flex; align-items: center; justify-content: center;">
+                @if (showPassword) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                }
+              </button>
+            </div>
           </div>
 
           <button type="submit" class="submit-btn" [disabled]="isLoading">
@@ -196,6 +224,7 @@ export class LoginComponent {
 
   email = 'admin@lenosrellenos.com';
   password = '';
+  showPassword = false;
   isLoading = false;
   errorMessage = '';
 

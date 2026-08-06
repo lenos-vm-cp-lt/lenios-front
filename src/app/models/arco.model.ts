@@ -22,3 +22,21 @@ export interface SolicitudArcoResponse {
   mensaje?: string;
   fechaRegistro?: string;
 }
+
+/**
+ * Representación completa de una Solicitud ARCO leída desde la base de datos (MongoDB).
+ */
+export interface SolicitudArcoItem {
+  _id: string;
+  folio?: string;
+  clienteId?: any;
+  nombreCompleto?: string;
+  email?: string;
+  telefono?: string;
+  tipo: string;
+  estado: string;
+  detalleSolicitud?: string;
+  respuesta?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

@@ -7,23 +7,37 @@ import { ProductCardComponent } from '../product-card/product-card.component';
 import { OrderSummaryComponent } from '../order-summary/order-summary.component';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
+import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { PrivacyModalComponent } from '../privacy-modal/privacy-modal.component';
+import { ToastComponent } from '../toast/toast.component';
 
 /**
  * Componente Standalone de la Vista Principal / Catálogo Digital de Leños Rellenos.
- * Coordina e integra el Carrusel Dinámico Superior, el Grid Responsivo de Productos
- * y la barra flotante/panel interactivo de Resumen de Pedido (`order-summary`).
+ * Coordina el Carrusel Dinámico, el Grid Responsivo, la barra de estado de Usuario,
+ * comprobación inmediata del Aviso de Privacidad y notificaciones Toast globales.
  */
 @Component({
   selector: 'app-catalog',
   standalone: true,
-  imports: [CommonModule, HomeCarouselComponent, ProductCardComponent, OrderSummaryComponent, RouterLink],
+  imports: [
+    CommonModule,
+    HomeCarouselComponent,
+    ProductCardComponent,
+    OrderSummaryComponent,
+    AuthModalComponent,
+    PrivacyModalComponent,
+    ToastComponent
+  ],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.css'
 })
 export class CatalogComponent implements OnInit {
   private cartService = inject(CartService);
   private productService = inject(ProductService);
+  private toastService = inject(ToastService);
+  readonly authService = inject(AuthService);
 
   /** Todos los productos del catálogo */
   products: Product[] = [];
@@ -37,6 +51,10 @@ export class CatalogComponent implements OnInit {
   /** Controla el estado de carga de los productos */
   isLoading = false;
 
+  showAuthModal = false;
+  showPrivacyModal = false;
+  showMandatoryPrivacyModal = false;
+
   /** Observable con el número total de unidades en el carrito */
   itemCount$: Observable<number>;
 
@@ -46,6 +64,16 @@ export class CatalogComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCatalog();
+    this.checkPrivacyNotice();
+  }
+
+  /**
+   * Comprueba si el usuario autenticado requiere aceptar de inmediato el Aviso de Privacidad.
+   */
+  checkPrivacyNotice(): void {
+    if (this.authService.isAuthenticated() && !this.authService.hasAcceptedPrivacy()) {
+      this.showMandatoryPrivacyModal = true;
+    }
   }
 
   /**
@@ -56,7 +84,6 @@ export class CatalogComponent implements OnInit {
     this.productService.getProducts().subscribe({
       next: (data) => {
         this.products = data;
-        // Tomamos los primeros 5 productos disponibles para mostrarlos en el carrusel
         this.featuredProducts = data.slice(0, 5);
         this.isLoading = false;
       },
@@ -65,6 +92,50 @@ export class CatalogComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  openAuthModal(): void {
+    this.showAuthModal = true;
+  }
+
+  closeAuthModal(): void {
+    this.showAuthModal = false;
+  }
+
+  onAuthSuccess(): void {
+    this.showAuthModal = false;
+    this.checkPrivacyNotice();
+  }
+
+  onPrivacyAccepted(): void {
+    this.showMandatoryPrivacyModal = false;
+  }
+
+  onPrivacyRejected(): void {
+    this.showMandatoryPrivacyModal = false;
+  }
+
+  openPrivacyModal(): void {
+    this.showPrivacyModal = true;
+  }
+
+  closePrivacyModal(): void {
+    this.showPrivacyModal = false;
+  }
+
+  getUserInitials(): string {
+    const user = this.authService.getUserInfo();
+    if (!user || !user.name) return 'U';
+    const names = user.name.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return names[0].substring(0, 2).toUpperCase();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.toastService.info('Has cerrado tu sesión correctamente. ¡Hasta pronto!', 'Sesión Finalizada');
   }
 
   /**

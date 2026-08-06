@@ -11,122 +11,176 @@ import { Product } from '../../../models/product.model';
     @if (isOpen) {
       <div class="modal-overlay" (click)="onOverlayClick($event)" role="presentation" tabindex="-1">
         <div class="modal-card">
+          <!-- Encabezado Fijo Genérico -->
           <header class="modal-header">
-            <h3>{{ product ? 'Editar Producto' : 'Crear Nuevo Producto' }}</h3>
+            <div class="header-title-box">
+              <div class="header-badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3>{{ product ? 'Editar Producto' : 'Crear Nuevo Producto' }}</h3>
+                <span class="header-sub">Actualiza los datos del menú artesanal</span>
+              </div>
+            </div>
             <button class="close-btn" (click)="onClose()" aria-label="Cerrar modal">&times;</button>
           </header>
 
-          <form (ngSubmit)="onSubmit()" class="modal-form">
-            <!-- Fila de Vista Previa de Imagen -->
-            <div class="preview-row">
-              <div class="image-preview-container">
-                <span class="preview-label">Vista Previa de Imagen</span>
-                <div class="preview-box">
-                  @if (imagePreviewUrl) {
-                    <img [src]="imagePreviewUrl" alt="Vista previa del producto" class="preview-img" />
-                  } @else {
-                    <div class="placeholder-preview">
-                      <span class="preview-icon">📷</span>
-                      <span class="preview-text">Subir imagen</span>
-                    </div>
-                  }
+          <form (ngSubmit)="onSubmit()" class="modal-form-wrapper">
+            <!-- Cuerpo Desplazable (Únicamente el body scrollea) -->
+            <div class="modal-body-scroll">
+              <!-- Fila de Vista Previa de Imagen Interactiva -->
+              <div class="preview-row">
+                <div class="image-preview-container">
+                  <span class="preview-label">Fotografía del Producto</span>
+                  <div class="preview-box">
+                    @if (imagePreviewUrl) {
+                      <img [src]="imagePreviewUrl" alt="Vista previa del producto" class="preview-img" />
+                      <div class="preview-overlay">
+                        <button type="button" class="action-overlay-btn" (click)="openZoom($event)" title="Ver fotografía completa en alta resolución">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                          </svg>
+                          <span>Ver Completa</span>
+                        </button>
+
+                        <button type="button" class="action-overlay-btn" (click)="fileInput.click()" title="Seleccionar otra fotografía">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                          </svg>
+                          <span>Cambiar Foto</span>
+                        </button>
+                      </div>
+                    } @else {
+                      <div class="placeholder-preview" (click)="fileInput.click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="42" height="42" style="color: #ea580c;">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                          <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <span class="preview-text">Haz clic para cargar imagen</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="preview-actions-bar">
+                    @if (imagePreviewUrl) {
+                      <button type="button" class="inline-preview-btn" (click)="openZoom($event)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                        </svg>
+                        <span>Ver en Pantalla Completa</span>
+                      </button>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="modalProdName">Nombre del Producto *</label>
-                <input 
-                  id="modalProdName" 
-                  type="text" 
-                  [(ngModel)]="formData.name" 
-                  name="name" 
-                  required 
-                  class="form-control" 
-                  placeholder="ej. Leño Tradicional Arequipe" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="modalProdName">Nombre del Producto *</label>
+                  <input 
+                    id="modalProdName" 
+                    type="text" 
+                    [(ngModel)]="formData.name" 
+                    name="name" 
+                    required 
+                    class="form-control" 
+                    placeholder="ej. Leño Tradicional Arequipe" />
+                </div>
+
+                <div class="form-group">
+                  <label for="modalProdPrice">Precio ($) *</label>
+                  <input 
+                    id="modalProdPrice" 
+                    type="number" 
+                    step="0.01" 
+                    [(ngModel)]="formData.price" 
+                    name="price" 
+                    required 
+                    class="form-control" 
+                    placeholder="80.00" />
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="modalProdPrice">Precio ($) *</label>
-                <input 
-                  id="modalProdPrice" 
-                  type="number" 
-                  step="0.01" 
-                  [(ngModel)]="formData.price" 
-                  name="price" 
-                  required 
-                  class="form-control" 
-                  placeholder="19.99" />
-              </div>
-            </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="modalProdStock">Stock de Inventario *</label>
+                  <input 
+                    id="modalProdStock" 
+                    type="number" 
+                    [(ngModel)]="formData.stock" 
+                    name="stock" 
+                    required 
+                    class="form-control" 
+                    placeholder="10" />
+                </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="modalProdStock">Stock de Inventario *</label>
-                <input 
-                  id="modalProdStock" 
-                  type="number" 
-                  [(ngModel)]="formData.stock" 
-                  name="stock" 
-                  required 
-                  class="form-control" 
-                  placeholder="10" />
+                <div class="form-group">
+                  <label for="modalProdCategory">Categoría *</label>
+                  <select id="modalProdCategory" [(ngModel)]="formData.category" name="category" class="form-control">
+                    <option value="Dulces">Dulces</option>
+                    <option value="Salados">Salados</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Especiales">Especiales</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="modalProdCategory">Categoría *</label>
-                <select id="modalProdCategory" [(ngModel)]="formData.category" name="category" class="form-control">
-                  <option value="Dulces">Dulces</option>
-                  <option value="Salados">Salados</option>
-                  <option value="Bebidas">Bebidas</option>
-                  <option value="Especiales">Especiales</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="modalProdImage">Imagen del Producto ('imagen')</label>
-                <input 
-                  id="modalProdImage" 
-                  type="file" 
-                  accept="image/*" 
-                  (change)="onFileSelected($event)" 
-                  class="form-control file-input" />
-                @if (selectedFileName) {
-                  <small class="file-info">Seleccionado: {{ selectedFileName }}</small>
-                }
-              </div>
-
-              <div class="form-group toggle-group">
-                <label for="modalProdAvailable">Disponible para Venta</label>
-                <div class="switch-container">
-                  <label class="switch">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="modalProdImage">Subir / Reemplazar Imagen</label>
+                  <div class="custom-file-upload">
+                    <button type="button" class="file-picker-btn" (click)="fileInput.click()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>{{ selectedFileName ? 'Cambiar Selección' : 'Seleccionar Archivo de Mi Equipo' }}</span>
+                    </button>
                     <input 
-                      id="modalProdAvailable" 
-                      type="checkbox" 
-                      [(ngModel)]="formData.disponible" 
-                      name="disponible" />
-                    <span class="slider round"></span>
-                  </label>
-                  <span class="switch-text">{{ formData.disponible ? 'Disponible' : 'No Disponible' }}</span>
+                      #fileInput 
+                      id="modalProdImage" 
+                      type="file" 
+                      accept="image/*" 
+                      (change)="onFileSelected($event)" 
+                      class="hidden-file-input" />
+                  </div>
                 </div>
+
+                <div class="form-group toggle-group">
+                  <label for="modalProdAvailable">Disponible para Venta</label>
+                  <div class="switch-container">
+                    <label class="switch">
+                      <input 
+                        id="modalProdAvailable" 
+                        type="checkbox" 
+                        [(ngModel)]="formData.disponible" 
+                        name="disponible" />
+                      <span class="slider round"></span>
+                    </label>
+                    <span class="switch-text" [class.active-text]="formData.disponible">
+                      {{ formData.disponible ? 'Disponible' : 'No Disponible' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="modalProdDesc">Descripción</label>
+                <textarea 
+                  id="modalProdDesc" 
+                  [(ngModel)]="formData.description" 
+                  name="description" 
+                  rows="3" 
+                  class="form-control" 
+                  placeholder="Descripción del plato y sus ingredientes..."></textarea>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="modalProdDesc">Descripción</label>
-              <textarea 
-                id="modalProdDesc" 
-                [(ngModel)]="formData.description" 
-                name="description" 
-                rows="3" 
-                class="form-control" 
-                placeholder="Descripción del plato y sus ingredientes..."></textarea>
-            </div>
-
-            <footer class="form-actions">
+            <!-- Footer Fijo Genérico -->
+            <footer class="modal-footer">
               <button type="button" class="btn btn-secondary" (click)="onClose()">
                 Cancelar
               </button>
@@ -138,114 +192,280 @@ import { Product } from '../../../models/product.model';
         </div>
       </div>
     }
+
+    <!-- Lightbox de Vista Completa de Imagen -->
+    @if (isZoomOpen && imagePreviewUrl) {
+      <div class="lightbox-overlay" (click)="isZoomOpen = false" tabindex="0" (keydown.escape)="isZoomOpen = false">
+        <div class="lightbox-card" (click)="$event.stopPropagation()">
+          <button type="button" class="lightbox-close-btn" (click)="isZoomOpen = false" title="Cerrar vista completa">&times;</button>
+          <img [src]="imagePreviewUrl" [alt]="formData.name || 'Fotografía de Producto'" class="lightbox-img" />
+          <div class="lightbox-caption">
+            <strong>{{ formData.name || 'Fotografía del Producto' }}</strong>
+            <span>Vista completa en alta resolución</span>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
+      inset: 0;
+      background: rgba(18, 11, 7, 0.82);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-      outline: none;
+      z-index: 1100;
+      padding: 1.25rem;
+      animation: fadeInOverlay 0.25s ease-out;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     .modal-card {
-      background: var(--color-bg-card, #fff);
-      border-radius: var(--radius-lg, 12px);
-      width: 90%;
-      max-width: 600px;
-      padding: 1.75rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      border: 1px solid var(--color-border-subtle, #e5e7eb);
+      background: #ffffff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      border: 1px solid #f0e6df;
+      overflow: hidden;
+      animation: modalZoomIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalZoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.92) translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
     
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.25rem;
-      border-bottom: 2px solid var(--color-orange-subtle, #fed7aa);
-      padding-bottom: 0.5rem;
+      padding: 1.25rem 1.75rem;
+      border-bottom: 1px solid #f0e6df;
+      flex-shrink: 0;
+      background: #ffffff;
+      z-index: 10;
     }
+
+    .header-title-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-badge-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ea580c, #c2410c);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(234, 88, 12, 0.3);
+    }
+
     .modal-header h3 {
       font-size: 1.25rem;
-      color: var(--color-brown-dark, #431407);
+      color: #3b281c;
+      font-weight: 800;
       margin: 0;
     }
+
+    .header-sub {
+      font-size: 0.8rem;
+      color: #7c685b;
+    }
+
     .close-btn {
-      background: transparent;
+      background: #f3eae3;
       border: none;
-      font-size: 1.5rem;
-      color: var(--color-text-muted, #6b7280);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      color: #6b5548;
       cursor: pointer;
-      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #ea580c;
+      color: #ffffff;
+    }
+
+    .modal-form-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .modal-body-scroll {
+      padding: 1.5rem 1.75rem;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
     }
     
-    /* Preview box style */
     .preview-row {
       display: flex;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
+
     .image-preview-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
     }
+
     .preview-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-brown-dark, #431407);
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #3b281c;
     }
+
     .preview-box {
-      width: 150px;
-      height: 150px;
-      border: 2px dashed var(--color-border-subtle, #e5e7eb);
-      border-radius: var(--radius-md, 8px);
+      position: relative;
+      width: 260px;
+      height: 190px;
+      border: 2.5px dashed #ea580c;
+      border-radius: 20px;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: var(--color-bg-cream, #fffbeb);
-      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+      background: #faf4ef;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+
+    .image-preview-container:hover .preview-box {
+      border-color: #c2410c;
+      box-shadow: 0 8px 20px rgba(234, 88, 12, 0.2);
+    }
+
     .preview-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 11, 7, 0.78);
+      backdrop-filter: blur(3px);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      border-radius: 18px;
+      padding: 1rem;
+    }
+
+    .preview-box:hover .preview-overlay {
+      opacity: 1;
+    }
+
+    .action-overlay-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      background: linear-gradient(135deg, #ea580c, #c2410c);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: transform 0.15s;
+    }
+
+    .action-overlay-btn:hover {
+      transform: scale(1.04);
+    }
+
+    .preview-actions-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .inline-preview-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #faf4ef;
+      color: #ea580c;
+      border: 1px solid #f0e6df;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .inline-preview-btn:hover {
+      background: #ea580c;
+      color: #ffffff;
+      border-color: #ea580c;
+    }
+
     .placeholder-preview {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.35rem;
-      color: var(--color-text-muted, #6b7280);
-    }
-    .preview-icon {
-      font-size: 2rem;
-    }
-    .preview-text {
-      font-size: 0.75rem;
-      font-weight: 500;
+      gap: 0.4rem;
+      color: #7c685b;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
     }
 
-    .modal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+    .preview-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ea580c;
     }
+
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
+
     @media (max-width: 640px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -257,53 +477,87 @@ import { Product } from '../../../models/product.model';
       flex-direction: column;
       gap: 0.35rem;
     }
+
     .form-group label {
       font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-brown-dark, #431407);
+      font-weight: 700;
+      color: #4a382d;
     }
+
     .form-control {
-      padding: 0.65rem 0.85rem;
-      border: 1px solid var(--color-border-subtle, #e5e7eb);
-      border-radius: var(--radius-md, 8px);
-      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e7dcd3;
+      border-radius: 12px;
+      font-size: 0.92rem;
       outline: none;
+      background: #faf7f4;
+      transition: all 0.2s;
     }
+
     .form-control:focus {
-      border-color: var(--color-orange-primary, #ea580c);
+      border-color: #ea580c;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.12);
     }
     
-    .file-input {
-      padding: 0.4rem;
-      background: var(--color-bg-cream, #fffbeb);
+    .custom-file-upload {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.2rem;
     }
-    .file-info {
-      font-size: 0.8rem;
-      color: var(--color-orange-primary, #ea580c);
-      font-weight: 500;
+
+    .hidden-file-input {
+      display: none;
+    }
+
+    .file-picker-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      background: #f3eae3;
+      color: #ea580c;
+      border: 1.5px solid #e7dcd3;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .file-picker-btn:hover {
+      background: #ea580c;
+      color: #ffffff;
+      border-color: #ea580c;
     }
     
     /* Toggle Switch */
     .toggle-group {
       justify-content: flex-end;
     }
+
     .switch-container {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       padding: 0.5rem 0;
     }
+
     .switch {
       position: relative;
       display: inline-block;
-      width: 44px;
-      height: 22px;
+      width: 46px;
+      height: 24px;
     }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -311,64 +565,166 @@ import { Product } from '../../../models/product.model';
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #ccc;
+      background-color: #d1d5db;
       transition: .3s;
     }
+
     .slider:before {
       position: absolute;
       content: "";
-      height: 16px;
-      width: 16px;
+      height: 18px;
+      width: 18px;
       left: 3px;
       bottom: 3px;
       background-color: white;
       transition: .3s;
     }
+
     input:checked + .slider {
       background-color: #ea580c;
     }
+
     input:checked + .slider:before {
       transform: translateX(22px);
     }
+
     .slider.round {
-      border-radius: 22px;
+      border-radius: 24px;
     }
+
     .slider.round:before {
       border-radius: 50%;
     }
+
     .switch-text {
       font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--color-brown-dark, #431407);
+      font-weight: 600;
+      color: #7c685b;
+    }
+
+    .switch-text.active-text {
+      color: #ea580c;
+      font-weight: 700;
     }
     
-    .form-actions {
+    .modal-footer {
+      padding: 1.25rem 1.75rem;
+      border-top: 1px solid #f0e6df;
+      background: #ffffff;
+      flex-shrink: 0;
       display: flex;
       justify-content: flex-end;
       gap: 0.75rem;
-      margin-top: 1rem;
-      border-top: 1px solid var(--color-border-subtle, #e5e7eb);
-      padding-top: 1rem;
+      z-index: 10;
     }
     
     .btn {
-      padding: 0.65rem 1.25rem;
-      border-radius: var(--radius-md, 8px);
-      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 700;
       cursor: pointer;
       border: none;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      transition: transform 0.2s;
     }
+
     .btn-primary {
-      background: var(--color-orange-primary, #ea580c);
+      background: linear-gradient(135deg, #ea580c, #c2410c);
       color: #fff;
+      font-weight: 800;
+      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35);
     }
+
     .btn-primary:hover:not(:disabled) {
-      background: var(--color-orange-bright, #f97316);
+      transform: translateY(-1px);
     }
+
     .btn-secondary {
-      background: #e5e7eb;
-      color: #374151;
+      background: #f3eae3;
+      color: #6b5548;
+    }
+
+    .btn-secondary:hover {
+      background: #e7dcd3;
+    }
+
+    /* ─── Lightbox Modal Styles ─────────────────────────────────────────── */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 7, 4, 0.92);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 2rem;
+      animation: fadeInOverlay 0.25s ease-out;
+      outline: none;
+    }
+
+    .lightbox-card {
+      position: relative;
+      background: #2b1b0e;
+      border-radius: 24px;
+      padding: 1rem;
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(234, 88, 12, 0.3);
+      animation: modalZoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ea580c;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    .lightbox-close-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .lightbox-img {
+      max-width: 80vw;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .lightbox-caption {
+      margin-top: 0.85rem;
+      text-align: center;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .lightbox-caption strong {
+      font-size: 1.1rem;
+      color: #f97316;
+    }
+
+    .lightbox-caption span {
+      font-size: 0.8rem;
+      color: #d1d5db;
     }
   `]
 })
@@ -392,6 +748,7 @@ export class FormularioProductoComponent implements OnChanges {
   selectedFile: File | null = null;
   selectedFileName = '';
   imagePreviewUrl: string | null = null;
+  isZoomOpen = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && this.isOpen) {
@@ -418,6 +775,14 @@ export class FormularioProductoComponent implements OnChanges {
       }
       this.selectedFile = null;
       this.selectedFileName = '';
+      this.isZoomOpen = false;
+    }
+  }
+
+  openZoom(event: Event): void {
+    event.stopPropagation();
+    if (this.imagePreviewUrl) {
+      this.isZoomOpen = true;
     }
   }
 
