@@ -9,6 +9,9 @@ export interface PedidoItem {
   cantidad: number;
   precio_unitario: number;
   nombre?: string;
+  producto?: {
+    nombre: string;
+  };
 }
 
 export interface PedidoCliente {
@@ -56,7 +59,7 @@ export class PedidoService {
   private readonly apiUrl = `${environment.apiUrl}/pedidos`;
 
   /**
-   * Crea un nuevo pedido enviando los datos al backend.
+   * Crea un nuevo pedido enviando los datos al backend (Flujo de cliente).
    * @param payload Datos del pedido.
    */
   crearPedido(payload: PedidoPayload): Observable<PedidoCreado> {
@@ -71,7 +74,7 @@ export class PedidoService {
   }
 
   /**
-   * Obtiene la lista completa de pedidos.
+   * Obtiene la lista completa de pedidos (Flujo de admin).
    */
   getPedidos(): Observable<PedidoCreado[]> {
     return this.http.get<ApiResponse<PedidoCreado[]>>(this.apiUrl).pipe(
