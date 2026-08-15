@@ -416,14 +416,15 @@ export class AuthModalComponent {
   private toastService = inject(ToastService);
 
   constructor() {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(emailPattern)]],
       password: ['', Validators.required]
     });
 
     this.registerForm = this.fb.group({
       nombre: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(emailPattern)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       ubicacion: ['']
