@@ -13,7 +13,7 @@
 
 /* Header Principal */
 .main-header {
-  background-color: var(--color-brown-darkest);
+  background-color: var(--color-surface-brand);
   border-bottom: 3px solid var(--color-orange-primary);
   padding: 1rem 1.5rem;
   box-shadow: var(--shadow-md);
@@ -70,7 +70,7 @@
 
 .brand-subtitle {
   font-size: 0.75rem;
-  color: var(--color-orange-light);
+  color: var(--color-text-on-brand);
   margin: 0;
 }
 
@@ -88,7 +88,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 6px 14px;
   border-radius: var(--radius-full);
-  color: var(--color-orange-light);
+  color: var(--color-text-on-brand);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -106,6 +106,7 @@
   0% {
     box-shadow: 0 0 0 0 rgba(255, 140, 56, 0.7);
   }
+
   70% {
     box-shadow: 0 0 0 8px rgba(255, 140, 56, 0);
   }
@@ -116,7 +117,7 @@
   align-items: center;
   gap: 0.4rem;
   background: rgba(255, 255, 255, 0.1);
-  color: var(--color-orange-light, #ffd8be);
+  color: var(--color-text-on-brand, #ffd8be);
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.5rem 0.9rem;
   border-radius: var(--radius-full, 20px);
@@ -149,9 +150,11 @@
     opacity: 0;
     transform: scale(0.8) translateY(-5px);
   }
+
   70% {
     transform: scale(1.05);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -259,7 +262,7 @@
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
-  background: var(--color-brown-darkest);
+  background: var(--color-surface-brand);
   color: var(--color-orange-secondary);
   border-radius: var(--radius-full);
   font-size: 0.78rem;
@@ -354,13 +357,23 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* Botón Flotante para Carrito */
@@ -397,7 +410,7 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  background: var(--color-brown-darkest);
+  background: var(--color-surface-brand);
   color: var(--color-orange-secondary);
   min-width: 22px;
   height: 22px;
@@ -452,7 +465,7 @@
 
 /* Footer */
 .main-footer {
-  background-color: var(--color-brown-darkest);
+  background-color: var(--color-surface-brand);
   color: var(--color-text-light);
   padding: 2.5rem 1.5rem;
   border-top: 1px solid var(--color-brown-primary);
@@ -478,7 +491,7 @@
 }
 
 .footer-brand p {
-  color: var(--color-orange-light);
+  color: var(--color-text-on-brand);
   font-size: 0.875rem;
 }
 
@@ -494,7 +507,8 @@
   text-align: center;
 }
 
-.footer-link, .footer-link-btn {
+.footer-link,
+.footer-link-btn {
   color: var(--color-orange-primary);
   text-decoration: none;
   background: none;
@@ -506,13 +520,15 @@
   transition: color 0.2s;
 }
 
-.footer-link:hover, .footer-link-btn:hover {
+.footer-link:hover,
+.footer-link-btn:hover {
   text-decoration: underline;
   color: var(--color-orange-bright);
 }
 
 /* Loading States & Spinners */
-.carousel-loading-placeholder, .catalog-loading-state {
+.carousel-loading-placeholder,
+.catalog-loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -541,7 +557,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .catalog-empty-state {
@@ -552,4 +570,3 @@
   border-radius: var(--radius-lg, 12px);
   border: 1px dashed var(--color-border-subtle, #e5e7eb);
 }
-

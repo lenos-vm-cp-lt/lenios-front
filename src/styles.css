@@ -25,6 +25,10 @@
   --color-text-muted: #6C594A;
   --color-text-light: #F8F4EF;
 
+  /* Superficie de marca FIJA (header/footer/carrusel) - NO cambia con el tema */
+  --color-surface-brand: #2B1B0E;
+  --color-text-on-brand: #FFE0C8;
+
   /* Sombra y Efectos */
   --shadow-sm: 0 2px 8px rgba(43, 27, 14, 0.06);
   --shadow-md: 0 6px 18px rgba(43, 27, 14, 0.1);
@@ -42,8 +46,56 @@
   --radius-full: 9999px;
 }
 
+/* ─── Modo Oscuro ─── */
+body.dark-theme {
+  --color-brown-darkest: #F8F4EF;
+  --color-brown-dark: #EFE4D6;
+  --color-brown-primary: #D4A574;
+  --color-brown-medium: #C9975A;
+  --color-brown-light: #A66E45;
+  --color-brown-soft: #8C532B;
+
+  --color-orange-primary: #FF8C38;
+  --color-orange-secondary: #FF6F00;
+  --color-orange-bright: #FFA860;
+  --color-orange-light: #4A2E19;
+  --color-orange-subtle: #3A2312;
+
+  --color-bg-main: #1A120A;
+  --color-bg-card: #241810;
+  --color-bg-cream: #2B1B0E;
+  --color-border-subtle: #3A2312;
+  --color-text-dark: #F8F4EF;
+  --color-text-muted: #C9B8A8;
+  --color-text-light: #23160B;
+
+  /* --color-surface-brand y --color-text-on-brand NO se redefinen aquí a propósito: se quedan fijas */
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-card);
+  color: var(--color-brown-darkest);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--color-orange-subtle);
+  border-color: var(--color-orange-primary);
+  color: var(--color-orange-primary);
+}
+
 /* Reset y base */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -60,16 +112,22 @@ body {
   color: var(--color-text-dark);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Outfit', 'Inter', sans-serif;
   font-weight: 700;
   color: var(--color-brown-darkest);
   line-height: 1.2;
 }
 
-/* ─── Scrollbar Inset Ultra-Elegante (Evita desbordamientos en esquinas) ───────────── */
+/* ─── Scrollbar Inset Ultra-Elegante (Evita desbordamientos en esquinas) ─── */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -97,10 +155,11 @@ h1, h2, h3, h4, h5, h6 {
   scrollbar-color: #ea580c transparent;
 }
 
-/* ─── Transiciones y Animaciones Suaves UI/UX ────────────────────────────── */
+/* ─── Transiciones y Animaciones Suaves UI/UX ─── */
 
-/* Transición suave para todos los overlays de modales y drawers */
-.modal-overlay, .privacy-overlay, .cart-drawer-overlay {
+.modal-overlay,
+.privacy-overlay,
+.cart-drawer-overlay {
   animation: smoothOverlayFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -109,14 +168,16 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
     backdrop-filter: blur(0px);
   }
+
   to {
     opacity: 1;
     backdrop-filter: blur(10px);
   }
 }
 
-/* Transición suave para tarjetas de modales */
-.modal-card, .modal-content, .privacy-card {
+.modal-card,
+.modal-content,
+.privacy-card {
   animation: smoothModalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   border-radius: 24px !important;
 }
@@ -126,13 +187,13 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
     transform: scale(0.95) translateY(10px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
 
-/* Desplazamiento fluido para el Drawer lateral del carrito */
 .cart-drawer-content {
   animation: smoothDrawerSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -142,22 +203,25 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
   }
 }
 
-/* Resplandor y elevación suave para botones */
-button, .btn {
+button,
+.btn {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-button:active:not(:disabled), .btn:active:not(:disabled) {
+button:active:not(:disabled),
+.btn:active:not(:disabled) {
   transform: scale(0.97) translateY(0) !important;
 }
 
-/* Enfoque animado suave para controles de formulario */
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
