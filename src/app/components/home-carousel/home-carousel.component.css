@@ -11,7 +11,7 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  background-color: var(--color-brown-darkest);
+  background-color: var(--color-surface-brand);
 }
 
 /* Track de Diapositivas */
@@ -33,7 +33,6 @@
   box-sizing: border-box;
 }
 
-/* Imagen de fondo y Overlay */
 .slide-image-container {
   position: absolute;
   inset: 0;
@@ -50,15 +49,12 @@
 .slide-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(43, 27, 14, 0.92) 0%,
-    rgba(74, 46, 25, 0.75) 50%,
-    rgba(43, 27, 14, 0.25) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(43, 27, 14, 0.92) 0%,
+      rgba(74, 46, 25, 0.75) 50%,
+      rgba(43, 27, 14, 0.25) 100%);
 }
 
-/* Contenido de la Diapositiva */
 .slide-content {
   position: relative;
   z-index: 2;
@@ -72,6 +68,7 @@
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -100,7 +97,7 @@
 .carousel-subtag {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(4px);
-  color: var(--color-orange-light);
+  color: var(--color-text-on-brand);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
@@ -115,12 +112,12 @@
   color: #FFFFFF;
   line-height: 1.15;
   margin-bottom: 0.75rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .slide-description {
   font-size: 1rem;
-  color: var(--color-orange-light);
+  color: var(--color-text-on-brand);
   line-height: 1.5;
   margin-bottom: 1.5rem;
   display: -webkit-box;
@@ -129,7 +126,6 @@
   overflow: hidden;
 }
 
-/* Acciones y Precio */
 .slide-actions {
   display: flex;
   align-items: center;
@@ -187,7 +183,6 @@
   transform: translateX(4px);
 }
 
-/* Botones de Navegación */
 .nav-btn {
   position: absolute;
   top: 50%;
@@ -227,7 +222,6 @@
   right: 20px;
 }
 
-/* Indicadores de Posición (Dots) */
 .indicators-container {
   position: absolute;
   bottom: 20px;
@@ -257,11 +251,11 @@
   box-shadow: var(--shadow-glow);
 }
 
-/* Media Queries Responsivas */
 @media screen and (max-width: 1024px) {
   .carousel-container {
     height: 400px;
   }
+
   .slide-title {
     font-size: 1.9rem;
   }
@@ -278,11 +272,9 @@
   }
 
   .slide-overlay {
-    background: linear-gradient(
-      180deg,
-      rgba(43, 27, 14, 0.4) 0%,
-      rgba(43, 27, 14, 0.95) 80%
-    );
+    background: linear-gradient(180deg,
+        rgba(43, 27, 14, 0.4) 0%,
+        rgba(43, 27, 14, 0.95) 80%);
   }
 
   .slide-content {
