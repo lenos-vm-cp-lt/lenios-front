@@ -9,6 +9,7 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { ThemeService } from '../../services/theme.service';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { PrivacyModalComponent } from '../privacy-modal/privacy-modal.component';
 import { ToastComponent } from '../toast/toast.component';
@@ -38,6 +39,7 @@ export class CatalogComponent implements OnInit {
   private productService = inject(ProductService);
   private toastService = inject(ToastService);
   readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   /** Todos los productos del catálogo */
   products: Product[] = [];
