@@ -59,8 +59,18 @@ import { ToastService } from '../../services/toast.service';
           </div>
 
           <div class="notice-section">
-            <h3>4. Protección de Datos y Derechos ARCO</h3>
-            <p>Sus datos no serán transferidos a terceros sin su consentimiento explícito. Usted puede ejercer en cualquier momento sus Derechos ARCO (Acceso, Rectificación, Cancelación u Oposición) comunicándose con nosotros o ingresando a la sección de Solicitud de Derechos ARCO.</p>
+            <h3>4. Transferencia de Datos a Terceros</h3>
+            <p>Conforme a la LGPDPPSO, autorizas la transferencia de datos estrictamente necesarios bajo protocolo seguro HTTPS/TLS a los siguientes proveedores indispensables:</p>
+            <ul>
+              <li><strong>WhatsApp (Meta):</strong> Notificaciones de confirmación y comunicación logística. Se transfieren exclusivamente los datos mínimos indispensable de entrega.</li>
+              <li><strong>Cloudinary:</strong> Almacenamiento, gestión y optimización de imágenes del catálogo y la plataforma.</li>
+              <li><strong>Proveedor de Nube:</strong> Alojamiento de la infraestructura del servidor API (Render) y base de datos (MongoDB Atlas), cifrados en tránsito y reposo.</li>
+            </ul>
+          </div>
+
+          <div class="notice-section">
+            <h3>5. Protección de Datos y Derechos ARCO</h3>
+            <p>Usted puede ejercer en cualquier momento sus Derechos ARCO (Acceso, Rectificación, Cancelación u Oposición) comunicándose con nosotros o ingresando a la sección de Solicitud de Derechos ARCO.</p>
           </div>
         </div>
 

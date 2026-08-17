@@ -40,8 +40,14 @@ import { RouterLink } from '@angular/router';
         </section>
 
         <section>
-          <h2>4. Transferencia de datos</h2>
-          <p>Sus datos personales no serán transferidos a terceros sin su consentimiento, salvo las excepciones previstas en la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.</p>
+          <h2>4. Transferencia de Datos a Terceros</h2>
+          <p>En estricto cumplimiento con la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados (LGPDPPSO) y normativas aplicables, Leños Rellenos realiza transferencias de datos personales únicamente a los proveedores indispensables para la operación del servicio y la entrega de pedidos. Todas las transferencias ocurren mediante comunicaciones cifradas sobre protocolo <strong>HTTPS/TLS</strong> y aplican el principio de minimización de datos:</p>
+          <ul>
+            <li><strong>WhatsApp (Meta Platforms, Inc.):</strong> Envío de notificaciones de confirmación de pedido y comunicación directa para la entrega. Se transfieren exclusivamente los datos mínimos indispensables para la logística (nombre del cliente, número telefónico, dirección de entrega y detalle de productos).</li>
+            <li><strong>Cloudinary Inc.:</strong> Almacenamiento, distribución y optimización de recursos multimedia e imágenes del catálogo y la plataforma bajo conexiones HTTPS seguras.</li>
+            <li><strong>Proveedor de Nube (Infraestructura y Base de Datos):</strong> Alojamiento de la infraestructura del servidor API (Render) y la base de datos (MongoDB Atlas), garantizando cifrado TLS v1.3 en tránsito y cifrado AES-256 en reposo.</li>
+          </ul>
+          <p>Leños Rellenos no vende, alquila ni comercializa sus datos personales con ningún tercero para fines publicitarios o ajenos al servicio contratado.</p>
         </section>
 
         <section>
