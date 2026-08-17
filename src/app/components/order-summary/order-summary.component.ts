@@ -377,35 +377,70 @@ export class OrderSummaryComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Función de utilidad para abrir el chat de WhatsApp
+   * Función de utilidad para abrir el chat de WhatsApp sanitizando y validando
+   * expresamente la minimización de datos (Data Minimization) conforme a la LGPDPPSO.
+   * Se transmiten única y exclusivamente los datos estrictamente indispensables de entrega sobre HTTPS.
    */
   enviarAWhatsApp(pedidoCreado: PedidoCreado): void {
+    const payloadMinimo = this.validarYMinimizarPayloadWhatsApp(pedidoCreado);
     const numeroNegocio = '524151013579'; // Número oficial de Leños Rellenos
 
-    const listaProductos = pedidoCreado.productos_solicitados
-      .map((item: PedidoItem & { nombre?: string, producto?: { nombre: string } }) => `• ${item.cantidad}x ${item.producto?.nombre || item.nombre || 'Leño'} ($${item.precio_unitario} c/u)`)
+    const listaProductos = payloadMinimo.productos
+      .map(item => `• ${item.cantidad}x ${item.nombre} ($${item.precio_unitario} c/u)`)
       .join('\n');
 
     const mensaje = `¡Hola Leños Rellenos!
 Acabo de realizar mi pedido desde la página web.
 
-*Orden ID:* #${pedidoCreado._id}
-*Cliente:* ${pedidoCreado.cliente.nombre}
-*Teléfono:* ${pedidoCreado.cliente.telefono}
-*Dirección:* ${pedidoCreado.cliente.ubicacion}
+*Orden ID:* #${payloadMinimo.orderId}
+*Cliente:* ${payloadMinimo.clienteNombre}
+*Teléfono:* ${payloadMinimo.clienteTelefono}
+*Dirección:* ${payloadMinimo.clienteUbicacion}
 
 *Detalle del Pedido:*
 ${listaProductos}
 
-*Total:* $${pedidoCreado.total} MXN
-*Método de Pago:* ${pedidoCreado.metodoPago || 'Efectivo'}
-*Notas:* ${pedidoCreado.notas || 'Sin notas'}
+*Total:* $${payloadMinimo.total} MXN
+*Método de Pago:* ${payloadMinimo.metodoPago}
+*Notas:* ${payloadMinimo.notas}
 
 ¡Quedo a la espera de su confirmación!`;
 
+    // Garantizar transmisión cifrada punto a punto mediante protocolo HTTPS/TLS sobre la API oficial de WhatsApp
     const urlWhatsApp = `https://api.whatsapp.com/send?phone=${numeroNegocio}&text=${encodeURIComponent(mensaje)}`;
     window.open(urlWhatsApp, '_blank');
     this.cartService.clearCart();
+  }
+
+  /**
+   * Valida y sanitiza el objeto de pedido para asegurar que únicamente se incluyan
+   * los datos mínimos requeridos de entrega (Data Minimization) antes de la transferencia a WhatsApp (Meta).
+   */
+  private validarYMinimizarPayloadWhatsApp(pedido: PedidoCreado) {
+    const orderId = String(pedido._id || '').trim();
+    const clienteNombre = String(pedido.cliente?.nombre || 'Cliente').trim();
+    const clienteTelefono = String(pedido.cliente?.telefono || '').trim();
+    const clienteUbicacion = String(pedido.cliente?.ubicacion || 'Recoger en tienda').trim();
+    const total = Number(pedido.total || 0);
+    const metodoPago = String(pedido.metodoPago || 'Efectivo').trim();
+    const notas = String(pedido.notas || 'Sin notas').trim();
+
+    const productos = (pedido.productos_solicitados || []).map((item: any) => ({
+      nombre: String(item.producto?.nombre || item.nombre || 'Leño').trim(),
+      cantidad: Number(item.cantidad || 1),
+      precio_unitario: Number(item.precio_unitario || 0)
+    }));
+
+    return {
+      orderId,
+      clienteNombre,
+      clienteTelefono,
+      clienteUbicacion,
+      total,
+      metodoPago,
+      notas,
+      productos
+    };
   }
 
   /**

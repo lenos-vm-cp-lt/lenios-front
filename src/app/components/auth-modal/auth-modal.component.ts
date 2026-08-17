@@ -157,6 +157,18 @@ import { ToastService } from '../../services/toast.service';
               <input id="reg-ubicacion" type="text" formControlName="ubicacion" placeholder="Calle Hidalgo #123, Col. Centro" />
             </div>
 
+            <div class="form-group privacy-checkbox-group" style="margin-top: 4px;">
+              <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; font-weight: 500; color: #4a382d; cursor: pointer;">
+                <input type="checkbox" formControlName="aceptaAviso" id="reg-acepta-aviso" style="margin-top: 3px; accent-color: #ea580c; width: 16px; height: 16px; flex-shrink: 0;" />
+                <span>
+                  Acepto el <button type="button" (click)="onViewPrivacy()" style="background: none; border: none; color: #ea580c; text-decoration: underline; font-weight: 700; cursor: pointer; padding: 0; font-size: inherit;">Aviso de Privacidad</button> y autorizo la transferencia de mis datos a terceros (WhatsApp/Meta, Cloudinary y Proveedor de Nube) conforme a la LGPDPPSO. *
+                </span>
+              </label>
+              @if (registerForm.get('aceptaAviso')?.touched && registerForm.get('aceptaAviso')?.invalid) {
+                <span class="field-error">Debes aceptar el Aviso de Privacidad y las transferencias a terceros para completar tu registro.</span>
+              }
+            </div>
+
             <button type="submit" class="submit-btn" [disabled]="isSubmitting">
               {{ isSubmitting ? 'Creando cuenta...' : 'Completar Registro' }}
             </button>
@@ -401,6 +413,7 @@ import { ToastService } from '../../services/toast.service';
 export class AuthModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() loginSuccess = new EventEmitter<void>();
+  @Output() requestPrivacyView = new EventEmitter<void>();
 
   mode: 'login' | 'register' = 'login';
   isSubmitting = false;
@@ -427,8 +440,13 @@ export class AuthModalComponent {
       email: ['', [Validators.required, Validators.email, Validators.pattern(emailPattern)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      ubicacion: ['']
+      ubicacion: [''],
+      aceptaAviso: [false, Validators.requiredTrue]
     });
+  }
+
+  onViewPrivacy(): void {
+    this.requestPrivacyView.emit();
   }
 
   switchMode(newMode: 'login' | 'register'): void {
@@ -481,7 +499,17 @@ export class AuthModalComponent {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    this.authService.registro(this.registerForm.value).subscribe({
+    const formVal = this.registerForm.value;
+    const registerPayload = {
+      nombre: formVal.nombre,
+      email: formVal.email,
+      password: formVal.password,
+      telefono: formVal.telefono,
+      ubicacion: formVal.ubicacion,
+      avisoPrivacidadAceptado: true
+    };
+
+    this.authService.registro(registerPayload).subscribe({
       next: (res) => {
         this.isSubmitting = false;
         const userName = res.usuario?.nombre || 'Cliente';
