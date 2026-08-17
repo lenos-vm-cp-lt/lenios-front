@@ -57,3 +57,63 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+---
+
+## Por qué la validación del cliente no es seguridad (#29)
+
+### 1. Principio de Arquitectura y Defensa en Profundidad
+En el desarrollo de aplicaciones web modernas, existe una distinción fundamental entre **Experiencia de Usuario (UX)** y **Seguridad del Sistema**:
+
+- **Validación en el Frontend (Angular / Cliente):** Las reglas de validación en la interfaz de usuario (como `Validators.required`, `Validators.email`, mensajes de error inline y desactivación de botones de formulario) existen **únicamente para mejorar la experiencia de usuario (UX)**. Su objetivo es brindar retroalimentación inmediata sin generar latencia de red.
+- **Superficie de Manipulación:** Debido a que el código frontend se ejecuta directamente en el dispositivo y navegador del usuario, un cliente o atacante posee control absoluto sobre el entorno. Cualquier formulario o regla frontend puede ser omitida modificando el DOM, desactivando JavaScript o realizando peticiones HTTP directas al backend mediante herramientas como `cURL`, `Postman`, `Fetch` o scripts personalizados.
+- **Validación en el Backend (Render / API REST):** La seguridad real, la integridad de la base de datos y la aplicación estricta de las reglas de negocio **recaen incondicionalmente en el Backend**. El servidor debe tratar **cualquier entrada proveniente del cliente como potencialmente maliciosa o no confiable**, validando la presencia, tipo y formato de cada campo a nivel de servidor.
+
+---
+
+### 2. Evidencia Técnica: Bypass de Formulario Frontend y Rechazo del Backend
+
+Se ejecutó una prueba de bypass enviando peticiones HTTP directas con `cURL` al endpoint de registro de usuarios en el backend alojado en Render (`https://lenios-back-docker.onrender.com/api/v1/auth/registro`), omitiendo la interfaz web de Angular.
+
+#### A) Petición cURL (Bypass del formulario Angular omitiendo la contraseña obligatoria)
+Se envió una solicitud `POST` directa omitiendo el campo obligatorio `password`:
+
+```bash
+curl -i -X POST https://lenios-back-docker.onrender.com/api/v1/auth/registro \
+  -H "Content-Type: application/json" \
+  -d '{"nombre": "Prueba Bypass Frontend", "email": "bypass-test@example.com"}'
+```
+
+#### B) Respuesta del Backend en Render (Rechazo con HTTP 400 Bad Request)
+El servidor interceptó y rechazó inmediatamente la petición a nivel de backend, retornando un código **HTTP 400 Bad Request** y impidiendo cualquier registro en la base de datos:
+
+```http
+HTTP/1.1 400 Bad Request
+Date: Mon, 17 Aug 2026 23:06:48 GMT
+Content-Type: application/json; charset=utf-8
+x-render-origin-server: Render
+Server: cloudflare
+
+{
+  "success": false,
+  "message": "Nombre, email y contraseña son requeridos",
+  "error": null
+}
+```
+
+#### C) Prueba con Formato Inválido de Correo Electrónico
+Al enviar una petición omitiendo la estructura válida de correo (`"email": "correo-invalido"`), la validación del esquema en el backend rechazó la solicitud a nivel de servidor:
+
+```json
+{
+  "success": false,
+  "message": "Usuario validation failed: email: Por favor ingresa un correo electrónico válido",
+  "error": null
+}
+```
+
+---
+
+### 3. Conclusión
+Esta prueba demuestra con evidencia real que la validación en el cliente no constituye una medida de seguridad. Aunque un atacante se salte todos los controles del formulario en Angular, la **validación estricta a nivel de servidor en Render rechaza las peticiones no válidas**, garantizando la robustez e integridad del sistema.
+
