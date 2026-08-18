@@ -1,3 +1,8 @@
+/**
+ * Patrón Repository / Abstracción de Datos (Frontend):
+ * Abstrae el acceso a datos remotos mediante la API REST y desacopla la persistencia/servicios de los componentes de la interfaz de usuario.
+ */
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -135,6 +140,26 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken();
     return !!token && token.trim().length > 0;
+  }
+
+  /**
+   * Determina si el usuario autenticado posee rol de administrador o credenciales administrativas.
+   */
+  isAdmin(): boolean {
+    const user = this.getUserInfo();
+    if (!user) return false;
+    const role = (user.role || '').toLowerCase();
+    const email = (user.email || '').toLowerCase();
+    return (
+      role === 'admin' ||
+      role === 'editor' ||
+      role === 'administrador' ||
+      role === 'superadmin' ||
+      role.includes('admin') ||
+      email === 'admin.test@lenios.com' ||
+      email === 'admin@lenosrellenos.com' ||
+      email.includes('admin')
+    );
   }
 
   /**

@@ -19,11 +19,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     });
   }
 
-  const user = authService.getUserInfo();
-  const userRole = (user?.role || '').toLowerCase();
-  const isAdminOrEditor = userRole === 'admin' || userRole === 'editor' || userRole === 'administrador';
-
-  if (!isAdminOrEditor) {
+  if (!authService.isAdmin()) {
     toastService.error('Tu cuenta no posee permisos de administrador para ingresar a esta sección.', 'Acceso Denegado');
     return router.createUrlTree(['/']);
   }

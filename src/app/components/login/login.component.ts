@@ -249,8 +249,14 @@ export class LoginComponent {
           this.authService.setUserInfo(response.user);
         }
 
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+        if (this.authService.isAdmin()) {
+          const targetUrl = returnUrl && returnUrl.startsWith('/admin') ? returnUrl : '/admin/dashboard';
+          this.router.navigateByUrl(targetUrl);
+        } else {
+          const targetUrl = returnUrl && !returnUrl.startsWith('/admin') ? returnUrl : '/';
+          this.router.navigateByUrl(targetUrl);
+        }
       },
       error: (err) => {
         this.isLoading = false;
