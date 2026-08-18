@@ -1,8 +1,8 @@
 # LeniosFront
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.2.
+Este proyecto fue generado utilizando Angular CLI versión 19.0.2.
 
-## Development server
+## Servidor de desarrollo
 
 To start a local development server, run:
 
@@ -12,7 +12,7 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Code scaffolding
+## Andamiaje de código
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
@@ -26,7 +26,7 @@ For a complete list of available schematics (such as `components`, `directives`,
 ng generate --help
 ```
 
-## Building
+## Compilación
 
 To build the project run:
 
@@ -36,7 +36,7 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Running unit tests
+## Ejecución de pruebas unitarias
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
@@ -44,7 +44,7 @@ To execute unit tests with the [Karma](https://karma-runner.github.io) test runn
 ng test
 ```
 
-## Running end-to-end tests
+## Ejecución de pruebas End-to-End
 
 For end-to-end (e2e) testing, run:
 
@@ -117,3 +117,18 @@ Al enviar una petición omitiendo la estructura válida de correo (`"email": "co
 ### 3. Conclusión
 Esta prueba demuestra con evidencia real que la validación en el cliente no constituye una medida de seguridad. Aunque un atacante se salte todos los controles del formulario en Angular, la **validación estricta a nivel de servidor en Render rechaza las peticiones no válidas**, garantizando la robustez e integridad del sistema.
 
+
+
+# Flujo de Trabajo y Políticas de Ramas (Git Flow) (#30)
+
+Este proyecto implementa un flujo de trabajo basado en Pull Requests y reglas de protección de ramas para garantizar la calidad del código y la colaboración ordenada:
+
+1. **Rama de Integración:**
+   - `develop`: Rama principal de trabajo y colaboración, protegida contra `push` directo.
+
+2. **Ramas de Funcionalidad (`feature/*`):**
+   - Todo desarrollo, corrección o mejora de issue debe realizarse en una rama independiente derivada de `develop` (ej. `feature/laura-front`).
+
+3. **Políticas de Integración (Branch Protection Rules):**
+   - **Prohibición de Push Directo:** Los intentos de realizar un `git push` directo hacia la rama `develop` son rechazados automáticamente por GitHub (violación de reglas de repositorio).
+   - **Revisiones Obligatorias:** Todo cambio para integrarse en `develop` se realiza estrictamente mediante un **Pull Request (PR)**, el cual requiere de forma obligatoria al menos **1 aprobación** de otro colaborador para habilitar el botón de fusión (*Merge*).
