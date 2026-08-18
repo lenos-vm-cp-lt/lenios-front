@@ -132,3 +132,40 @@ Este proyecto implementa un flujo de trabajo basado en Pull Requests y reglas de
 3. **Políticas de Integración (Branch Protection Rules):**
    - **Prohibición de Push Directo:** Los intentos de realizar un `git push` directo hacia la rama `develop` son rechazados automáticamente por GitHub (violación de reglas de repositorio).
    - **Revisiones Obligatorias:** Todo cambio para integrarse en `develop` se realiza estrictamente mediante un **Pull Request (PR)**, el cual requiere de forma obligatoria al menos **1 aprobación** de otro colaborador para habilitar el botón de fusión (*Merge*).
+
+---
+
+## Arquitectura y Patrones de Diseño (#31)
+
+### 1. Arquitectura de 3 Capas
+El sistema está estructurado formalmente en una **arquitectura de 3 capas**, garantizando alta modularidad, mantenibilidad, separación de responsabilidades y escalabilidad:
+
+1. **Capa de Presentación (Frontend Angular 19):**
+   - Corresponde a la interfaz gráfica del usuario (Single Page Application - SPA).
+   - Encargada de renderizar las vistas, gestionar la experiencia de usuario (UX), capturar eventos del usuario y realizar validaciones visuales de formularios.
+   
+2. **Capa de Negocio / Servicios (Backend Node.js con Express):**
+   - Contiene la lógica del dominio de la aplicación, controladores de endpoints REST, orquestación de servicios y middlewares de seguridad (autenticación JWT, control de acceso RBAC y desinfección/validación de datos de entrada).
+   
+3. **Capa de Datos y Repositorio (Mongoose ODM / MongoDB Atlas):**
+   - Responsable del acceso físico a los datos, definición de esquemas/modelos y la ejecución de operaciones de persistencia en la base de datos MongoDB Atlas.
+
+> [!IMPORTANT]
+> **Aclaración de Aislamiento de Capas:**
+> El Frontend (Angular) **no realiza ninguna consulta directa a la base de datos**. El cliente web interactúa de manera 100% aislada, consumiendo únicamente la **API REST HTTP/HTTPS** del backend. Toda lectura o modificación de datos requiere pasar por los controladores y verificaciones de seguridad de la Capa de Negocio del backend antes de tocar la base de datos.
+
+---
+
+### 2. Patrones de Diseño Aplicados y Justificación Técnico-Arquitectónica
+
+#### A) Patrón Singleton (Singleton Pattern)
+- **Ubicación en el código:** Archivo de conexión backend `lenios-back/src/config/db.js` (`DatabaseSingleton`).
+- **Descripción:** El patrón Singleton asegura que una clase tenga **una única instancia** en todo el ciclo de vida de la aplicación y proporciona un punto de acceso global a dicha instancia.
+- **Justificación:** La creación reiterada de conexiones a MongoDB en un entorno Node.js/Express agotaría rápidamente el pool de conexiones del servidor y provocaría fugas de memoria (*connection leaks*). Al implementar `DatabaseSingleton`, la aplicación reutiliza la misma conexión activa a MongoDB Atlas en cada solicitud HTTP, reduciendo latencia y optimizando el consumo de recursos.
+
+#### B) Patrón Repository (Repository Pattern)
+- **Ubicación en el código:** 
+  - **Backend (Persistencia):** Modelos Mongoose en `lenios-back/src/models/` (`Producto.js`, `Usuario.js`, `Pedido.js`, `Cliente.js`, `SolicitudArco.js`, `AuditLog.js`, etc.).
+  - **Frontend (Abstracción de API):** Servicios de Angular en `src/app/services/` (`product.service.ts`, `auth.service.ts`, `pedido.service.ts`, `arco.service.ts`, etc.).
+- **Descripción:** El patrón Repository actúa como una capa intermedia entre la capa de negocio y la capa de acceso a datos, abstraendo los detalles específicos de persistencia y presentando una interfaz limpia para las operaciones CRUD.
+- **Justificación:** Abstrae la lógica de persistencia y desacopla el acceso a datos de la capa de negocio. En el backend, los controladores interactúan con los modelos de Mongoose sin necesidad de construir consultas de bajo nivel a la base de datos. En el frontend, los componentes de Angular invocan métodos de los servicios sin conocer detalles de la infraestructura HTTP/Fetch, facilitando las pruebas unitarias y el mantenimiento del código.

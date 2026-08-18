@@ -1,3 +1,8 @@
+/**
+ * Patrón Repository / Abstracción de Datos (Frontend):
+ * Abstrae el acceso a datos remotos mediante la API REST y desacopla la persistencia/servicios de los componentes de la interfaz de usuario.
+ */
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
