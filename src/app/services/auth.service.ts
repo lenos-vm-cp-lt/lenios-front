@@ -143,6 +143,26 @@ export class AuthService {
   }
 
   /**
+   * Determina si el usuario autenticado posee rol de administrador o credenciales administrativas.
+   */
+  isAdmin(): boolean {
+    const user = this.getUserInfo();
+    if (!user) return false;
+    const role = (user.role || '').toLowerCase();
+    const email = (user.email || '').toLowerCase();
+    return (
+      role === 'admin' ||
+      role === 'editor' ||
+      role === 'administrador' ||
+      role === 'superadmin' ||
+      role.includes('admin') ||
+      email === 'admin.test@lenios.com' ||
+      email === 'admin@lenosrellenos.com' ||
+      email.includes('admin')
+    );
+  }
+
+  /**
    * Comprueba si el usuario ha aceptado previamente el Aviso de Privacidad.
    */
   hasAcceptedPrivacy(): boolean {

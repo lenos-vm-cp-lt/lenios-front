@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -427,6 +428,7 @@ export class AuthModalComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
 
   constructor() {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -477,10 +479,14 @@ export class AuthModalComponent {
     this.authService.login(email, password).subscribe({
       next: (res) => {
         this.isSubmitting = false;
-        const userName = res.usuario?.nombre || 'Cliente';
+        const userName = res.usuario?.nombre || res.user?.nombre || res.usuario?.name || res.user?.name || 'Cliente';
         this.toastService.success(`¡Bienvenido de nuevo, ${userName}!`, 'Sesión Iniciada');
         this.loginSuccess.emit();
         this.closeModal();
+
+        if (this.authService.isAdmin()) {
+          this.router.navigate(['/admin/dashboard']);
+        }
       },
       error: (err) => {
         this.isSubmitting = false;
