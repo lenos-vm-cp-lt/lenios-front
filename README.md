@@ -276,8 +276,8 @@ Para verificar las funciones protegidas del sistema y el panel de administració
 | Campo | Valor |
 |---|---|
 | Rol | Administrador de Prueba |
-| Correo electrónico | `admin.test@lenios.com` |
-| Contraseña | `AdminTest2026*` |
+| Correo electrónico | `admin@lenios.com` |
+| Contraseña | `Admin12345` |
 
 ### 5. Verificación de Flujo Completo de Punta a Punta (E2E)
 
