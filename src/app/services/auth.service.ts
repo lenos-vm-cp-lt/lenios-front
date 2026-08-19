@@ -221,4 +221,71 @@ export class AuthService {
       return null;
     }
   }
+
+  /**
+   * Extrae un mensaje de error limpio, amigable y profesional para la interfaz de usuario,
+   * evitando exponer errores técnicos en crudo (como "Http failure response...").
+   *
+   * @param err Objeto de error retornado por la petición HTTP u Observable
+   * @param fallbackDefault Mensaje amigable por defecto en caso de no encontrar un detalle específico
+   */
+  extractErrorMessage(err: any, fallbackDefault: string = 'Ocurrió un error al procesar la solicitud. Inténtalo de nuevo.'): string {
+    if (!err) {
+      return fallbackDefault;
+    }
+
+    // 1. Extraer mensaje específico enviado por el backend en el body del error
+    if (err.error) {
+      if (typeof err.error === 'string') {
+        const trimmed = err.error.trim();
+        if (!trimmed.startsWith('Http failure') && !trimmed.includes('<!DOCTYPE') && !trimmed.includes('<html')) {
+          return trimmed;
+        }
+      } else if (typeof err.error === 'object') {
+        if (err.error.message && typeof err.error.message === 'string') {
+          return err.error.message;
+        }
+        if (err.error.error && typeof err.error.error === 'string') {
+          return err.error.error;
+        }
+        if (Array.isArray(err.error.errors) && err.error.errors.length > 0) {
+          const firstErr = err.error.errors[0];
+          if (typeof firstErr === 'string') return firstErr;
+          if (firstErr?.msg && typeof firstErr.msg === 'string') return firstErr.msg;
+          if (firstErr?.message && typeof firstErr.message === 'string') return firstErr.message;
+        }
+      }
+    }
+
+    // 2. Si err.message existe pero NO es el string por defecto de Angular HTTP ("Http failure response...")
+    if (err.message && typeof err.message === 'string') {
+      const msg = err.message.trim();
+      if (!msg.startsWith('Http failure') && !msg.includes('http://') && !msg.includes('https://')) {
+        return msg;
+      }
+    }
+
+    // 3. Fallbacks amigables basados en código de estado HTTP (400, 401, 409, 500, etc.)
+    switch (err.status) {
+      case 0:
+        return 'No se pudo conectar con el servidor. Por favor verifica tu conexión a internet o inténtalo más tarde.';
+      case 400:
+        return 'Por favor verifica que tus datos sean correctos e inténtalo de nuevo.';
+      case 401:
+        return 'Correo o contraseña incorrectos. Por favor verifica tus credenciales.';
+      case 403:
+        return 'No tienes permisos para realizar esta acción.';
+      case 404:
+        return 'El recurso solicitado no fue encontrado.';
+      case 409:
+        return 'El correo electrónico ya se encuentra registrado. Por favor intenta iniciar sesión.';
+      case 422:
+        return 'Los datos ingresados no son válidos. Por favor verifícalos.';
+      default:
+        if (err.status >= 500) {
+          return 'Ocurrió un error en el servidor. Por favor inténtalo de nuevo más tarde.';
+        }
+        return fallbackDefault;
+    }
+  }
 }
