@@ -42,8 +42,13 @@ import { ToastService } from '../../services/toast.service';
         </div>
 
         @if (errorMessage) {
-          <div class="error-banner">
-            {{ errorMessage }}
+          <div class="error-banner" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="flex-shrink: 0;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorMessage }}</span>
           </div>
         }
 
@@ -316,6 +321,9 @@ import { ToastService } from '../../services/toast.service';
       margin-bottom: 1.25rem;
       font-size: 0.88rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .auth-form {
@@ -490,7 +498,7 @@ export class AuthModalComponent {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err.message || 'Correo o contraseña incorrectos';
+        this.errorMessage = this.authService.extractErrorMessage(err, 'Correo o contraseña incorrectos. Por favor verifica tus credenciales.');
         this.toastService.error(this.errorMessage, 'Error de Autenticación');
       }
     });
@@ -525,7 +533,7 @@ export class AuthModalComponent {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage = err.message || 'No se pudo completar el registro';
+        this.errorMessage = this.authService.extractErrorMessage(err, 'Por favor verifica que tus datos sean correctos e inténtalo de nuevo.');
         this.toastService.error(this.errorMessage, 'Error en Registro');
       }
     });

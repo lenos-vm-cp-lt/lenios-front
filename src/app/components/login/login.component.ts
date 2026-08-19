@@ -260,19 +260,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.isLoading = false;
-        if (err.error?.message) {
-          this.errorMessage = err.error.message;
-        } else if (err.error?.error) {
-          this.errorMessage = err.error.error;
-        } else if (err.status === 0) {
-          this.errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.';
-        } else if (err.status === 401 || err.status === 400) {
-          this.errorMessage = 'Credenciales incorrectas. Revisa tu correo y contraseña.';
-        } else if (err.message) {
-          this.errorMessage = err.message;
-        } else {
-          this.errorMessage = 'Ocurrió un error al intentar iniciar sesión. Inténtalo de nuevo.';
-        }
+        this.errorMessage = this.authService.extractErrorMessage(err, 'Correo o contraseña incorrectos. Por favor verifica tus credenciales.');
       }
     });
   }
